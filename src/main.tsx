@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 
 import { defineStore, useSnapshot } from '../lib';
 
-const counter = await defineStore({
-  async state() {
+const counter = defineStore({
+  state() {
     return {
       count: 0,
       first_name: 'john',

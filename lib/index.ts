@@ -16,7 +16,7 @@ type StoreDefinition<
   G extends Getters<T> = Getters<T>,
   A extends Actions<T> = {}
 > = {
-  state: () => T | Promise<T>;
+  state: () => T;
   getters?: G;
   actions?: A;
 };
@@ -45,16 +45,15 @@ const tawr = {
   },
 };
 
-async function defineStore<
+function defineStore<
   T extends object,
   G extends Getters<T>,
   A extends Actions<T>
->(storeDefinition: StoreDefinition<T, G, A>): Promise<StoreType<T, G, A>> {
+>(storeDefinition: StoreDefinition<T, G, A>): StoreType<T, G, A> {
   const { state: stateFunc, getters, actions } = storeDefinition;
 
   // Initialize state
-  const initialState = await stateFunc();
-  const proxyState = proxy<T>(initialState);
+  const proxyState = proxy<T>(stateFunc());
   const state = proxyState as StoreType<T, G, A>;
 
   // Getters
