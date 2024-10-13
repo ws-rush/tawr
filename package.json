@@ -1,0 +1,38 @@
+{
+  "name": "tawr",
+  "private": false,
+  "version": "0.0.1",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/tawr.umd.cjs",
+  "module": "./dist/tawr.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+		".": {
+			"import": "./dist/tawr.js",
+			"require": "./dist/tawr.umd.cjs"
+		}
+	},
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.2.10",
+    "vite-plugin-dts": "^4.2.4"
+  },
+  "peerDependencies": {
+    "react": "19.0.0-rc-09111202-20241011",
+    "react-dom": "19.0.0-rc-09111202-20241011"
+  },
+  "dependencies": {
+    "derive-valtio": "^0.2.0",
+    "valtio": "^2.0.0"
+  }
+}
