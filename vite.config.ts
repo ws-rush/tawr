@@ -7,8 +7,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: './lib/index.ts',
-      name: 'Tawr',
-      fileName: 'tawr'
+      name: 'TawrState',
+      fileName: 'tawr-state'
     },
     rollupOptions: {
       external: ['react', 'react-dom', 'react/jsx-runtime', 'valtio', 'derive-valtio']
