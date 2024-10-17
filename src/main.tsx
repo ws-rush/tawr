@@ -1,65 +1,67 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+// @ts-expect-error handle later
+import React, { Suspense, use } from "react";
+import { createRoot } from "react-dom/client";
 
-import { defineStore, useSnapshot } from '../lib';
-
-const counter = defineStore({
-  state() {
-    return {
-      count: 0,
-      first_name: 'john',
-      last_name: 'doe'
-    }
-  },
-  getters(state) {
-    return {
-      doubleCount: (get) => get(state).count * 2,
-      full_name: (get) => `${get(state).first_name} ${get(state).last_name}`
-    }
-  },
-  actions: {
-    inc() {
-      this.count++
-    },
-    dec() {
-      this.count--
-    },
-    incBy(num: number) {
-      this.count += num
-    },
-    decBy(num: number) {
-      this.count += num
-    },
-    rename(first_name: string, last_name: string) {
-      this.first_name = first_name
-      this.last_name = last_name
-    }
-  }
-})
+import { useSnapshot } from "../lib";
+import { counterStore } from "./countreStore";
+import { postsStore } from "./postsStore";
 
 function Actions() {
-  return <div>
-    <button type="button" onClick={() => counter.inc()}>inc</button>
-    <button type="button" onClick={() => counter.dec()}>dec</button>
-    <button type="button" onClick={() => counter.incBy(2)}>inc by 2</button>
-    <button type="button" onClick={() => counter.rename('rush', 'wusaby')}>chnage name</button>
-  </div>
+  return (
+    <div>
+      <button type="button" onClick={() => counterStore.inc()}>
+        inc
+      </button>
+      <button type="button" onClick={() => counterStore.dec()}>
+        dec
+      </button>
+      <button type="button" onClick={() => counterStore.incBy(2)}>
+        inc by 2
+      </button>
+      <button
+        type="button"
+        onClick={() => counterStore.rename("rush", "wusaby")}
+      >
+        chnage name
+      </button>
+    </div>
+  );
 }
 
 function Name() {
-  const store = useSnapshot(counter)
+  const counter = useSnapshot(counterStore);
 
-  return <h2>{store.full_name}</h2>
+  return <h2>{counter.full_name}</h2>;
 }
 
 function Count() {
-  const store = useSnapshot(counter)
+  const counter = useSnapshot(counterStore);
 
-  return <span>{store.doubleCount}</span>
+  return <span>{counter.doubleCount}</span>;
 }
 
-createRoot(document.getElementById('app')!).render(
+function Posts() {
+  const snap = useSnapshot(postsStore);
+
+  const posts = use(snap.posts);
+
+  console.log(posts);
+
+  return (
+    <ul>
+      {posts?.map((post: any) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+
+createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
+    <input type="number" onChange={(e) => postsStore.setUserId(e.target.value)} defaultValue={0} />
+    {/* <Suspense fallback={<p>Loading...</p>}> */}
+      <Posts />
+    {/* </Suspense> */}
     <Name />
     <Count />
     <Actions />
