@@ -1,7 +1,7 @@
 {
   "name": "tawr",
   "private": false,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "files": [
     "dist"
@@ -28,8 +28,8 @@
     "vite-plugin-dts": "^4.2.4"
   },
   "peerDependencies": {
-    "react": "19.0.0-rc-09111202-20241011",
-    "react-dom": "19.0.0-rc-09111202-20241011"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "dependencies": {
     "derive-valtio": "^0.2.0",
