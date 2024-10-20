@@ -1,6 +1,6 @@
 import { defineStore } from "../lib";
 
-export const postsStore = defineStore({
+export const postsStore = await defineStore({
   state() {
     return {
       userId: null,

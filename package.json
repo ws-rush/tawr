@@ -1,7 +1,7 @@
 {
   "name": "tawr-state",
   "private": false,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "files": [
     "dist"
@@ -27,12 +27,10 @@
     "vite": "^5.2.10",
     "vite-plugin-dts": "^4.2.4"
   },
-  "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
   "dependencies": {
     "derive-valtio": "^0.2.0",
-    "valtio": "^2.0.0"
+    "valtio": "^2.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
