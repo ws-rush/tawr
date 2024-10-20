@@ -1,18 +1,18 @@
 {
-  "name": "tawr",
+  "name": "tawr-state",
   "private": false,
   "version": "0.0.2",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/tawr.umd.cjs",
-  "module": "./dist/tawr.js",
+  "main": "./dist/tawr-state.umd.cjs",
+  "module": "./dist/tawr-state.js",
   "types": "./dist/lib/index.d.ts",
   "exports": {
 		".": {
-			"import": "./dist/tawr.js",
-			"require": "./dist/tawr.umd.cjs"
+			"import": "./dist/tawr-state.js",
+			"require": "./dist/tawr-state.umd.cjs"
 		}
 	},
   "scripts": {
