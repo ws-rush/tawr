@@ -24,6 +24,9 @@ function Actions() {
       >
         chnage name
       </button>
+
+      <button type="button" onClick={() => counterStore.$underive(['doubleCount'])}>$underive double_count</button>
+      <button type="button" onClick={() => counterStore.$invalidate(['doubleCount'])}>$invalidate double_count</button>
     </div>
   );
 }
@@ -37,19 +40,18 @@ function Name() {
 function Count() {
   const counter = useSnapshot(counterStore);
 
-  return <span>{counter.doubleCount}</span>;
+  return <>
+  <p>{counter.count}</p>
+  <p>{counter.doubleCount}</p>
+  </>;
 }
 
 function Posts() {
   const snap = useSnapshot(postsStore);
 
-  const posts = use(snap.posts);
-
-  console.log(posts);
-
   return (
     <ul>
-      {posts?.map((post: any) => (
+      {use(snap.posts)?.map((post: any) => (
         <li key={post.id}>{post.title}</li>
       ))}
     </ul>
