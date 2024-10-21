@@ -31,11 +31,7 @@ function Actions() {
 function Name() {
   const counter = useSnapshot(counterStore);
 
-counterStore.$underive(['doubleCount'])
-
-counterStore.$invalidate(['doubleCount'])
-
-  return <h2>{counter.count}</h2>;
+  return <h2>{counter.full_name}</h2>;
 }
 
 function Count() {
