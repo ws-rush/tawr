@@ -1,6 +1,6 @@
 import { defineStore } from "../lib"
 
-export const counterStore = await defineStore({
+export const counterStore = defineStore({
     state() {
       return {
         count: 0,

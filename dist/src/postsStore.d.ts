@@ -3,7 +3,5 @@ export declare const postsStore: {
 } & {
     posts: Promise<any>;
 } & {
-    setUserId(this: {
-        userId: null;
-    }, userId: any): void;
+    setUserId(userId: any): void;
 };

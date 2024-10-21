@@ -1,28 +1,18 @@
 import { useSnapshot } from 'valtio';
 type Get = <T extends object>(proxyObject: T) => T;
-type Getters<T> = (state: T) => {
+type Getters = {
     [K: string]: (get: Get) => any;
 };
-type Actions<T> = ThisType<T> & Record<string, (this: T, ...args: any[]) => any>;
-type Plugin<T extends object> = (context: {
-    store: T;
-    options: StoreDefinition<T>;
-}) => void | {
-    [key: string]: any;
+type Actions = Record<string, (...args: any[]) => any>;
+type GetterReturnTypes<G> = {
+    [K in keyof G]: G[K] extends (get: any) => infer R ? R : never;
 };
-type StoreDefinition<T extends object, G extends Getters<T> = Getters<T>, A extends Actions<T> = {}> = {
-    state: () => T;
-    getters?: G;
-    actions?: A;
+type ThisForActions<S, G, A> = S & GetterReturnTypes<G> & A;
+type StoreDefinition<S, G extends Getters, A> = {
+    state: () => S;
+    getters?: (state: S) => G;
+    actions?: A & ThisType<ThisForActions<S, G, A>>;
 };
-type GetterFunctions<T extends object, G extends Getters<T>> = G extends (state: T) => infer R ? R : never;
-type ExtractGetterReturnTypes<GObj> = {
-    [K in keyof GObj]: GObj[K] extends (get: any) => infer R ? R : never;
-};
-type GetterReturnTypes<T extends object, G extends Getters<T>> = ExtractGetterReturnTypes<GetterFunctions<T, G>>;
-type StoreType<T extends object, G extends Getters<T>, A extends Actions<T>> = T & GetterReturnTypes<T, G> & A;
-declare const tawr: {
-    use: <T extends object>(plugin: Plugin<T>) => void;
-};
-declare function defineStore<T extends object, G extends Getters<T>, A extends Actions<T>>(storeDefinition: StoreDefinition<T, G, A>): StoreType<T, G, A>;
-export { tawr, defineStore, useSnapshot };
+type StoreType<S, G, A> = S & GetterReturnTypes<G> & A;
+declare function defineStore<S extends object, G extends Getters, A extends Actions>(storeDefinition: StoreDefinition<S, G, A>): StoreType<S, G, A>;
+export { defineStore, useSnapshot };

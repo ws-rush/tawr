@@ -6,29 +6,9 @@ export declare const counterStore: {
     doubleCount: number;
     full_name: string;
 } & {
-    inc(this: {
-        count: number;
-        first_name: string;
-        last_name: string;
-    }): void;
-    dec(this: {
-        count: number;
-        first_name: string;
-        last_name: string;
-    }): void;
-    incBy(this: {
-        count: number;
-        first_name: string;
-        last_name: string;
-    }, num: number): void;
-    decBy(this: {
-        count: number;
-        first_name: string;
-        last_name: string;
-    }, num: number): void;
-    rename(this: {
-        count: number;
-        first_name: string;
-        last_name: string;
-    }, first_name: string, last_name: string): void;
+    inc(): void;
+    dec(): void;
+    incBy(num: number): void;
+    decBy(num: number): void;
+    rename(first_name: string, last_name: string): void;
 };

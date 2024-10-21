@@ -3,73 +3,45 @@ import { derive } from 'derive-valtio';
 
 type Get = <T extends object>(proxyObject: T) => T;
 
-type Getters<T> = (state: T) => { [K: string]: (get: Get) => any };
-type Actions<T> = ThisType<T> & Record<string, (this: T, ...args: any[]) => any>;
-
-type Plugin<T extends object> = (context: {
-  store: T;
-  options: StoreDefinition<T>;
-}) => void | { [key: string]: any };
-
-type StoreDefinition<
-  T extends object,
-  G extends Getters<T> = Getters<T>,
-  A extends Actions<T> = {}
-> = {
-  state: () => T;
-  getters?: G;
-  actions?: A;
+type Getters = {
+  [K: string]: (get: Get) => any;
 };
 
-type GetterFunctions<T extends object, G extends Getters<T>> = G extends (state: T) => infer R
-  ? R
-  : never;
+type Actions = Record<string, (...args: any[]) => any>;
 
-type ExtractGetterReturnTypes<GObj> = {
-  [K in keyof GObj]: GObj[K] extends (get: any) => infer R ? R : never;
+type GetterReturnTypes<G> = {
+  [K in keyof G]: G[K] extends (get: any) => infer R ? R : never;
 };
 
-type GetterReturnTypes<T extends object, G extends Getters<T>> = ExtractGetterReturnTypes<
-  GetterFunctions<T, G>
->;
+type ThisForActions<S, G, A> = S & GetterReturnTypes<G> & A;
 
-type StoreType<T extends object, G extends Getters<T>, A extends Actions<T>> = T &
-  GetterReturnTypes<T, G> &
-  A;
-
-const plugins: Plugin<any>[] = [];
-
-const tawr = {
-  use: <T extends object>(plugin: Plugin<T>) => {
-    plugins.push(plugin);
-  },
+type StoreDefinition<S, G extends Getters, A> = {
+  state: () => S;
+  getters?: (state: S) => G;
+  actions?: A & ThisType<ThisForActions<S, G, A>>;
 };
 
-function defineStore<
-  T extends object,
-  G extends Getters<T>,
-  A extends Actions<T>
->(storeDefinition: StoreDefinition<T, G, A>): StoreType<T, G, A> {
+type StoreType<S, G, A> = S & GetterReturnTypes<G> & A;
+
+function defineStore<S extends object, G extends Getters, A extends Actions>(
+  storeDefinition: StoreDefinition<S, G, A>
+): StoreType<S, G, A> {
   const { state: stateFunc, getters, actions } = storeDefinition;
 
-  // Initialize state
-  const proxyState = proxy<T>(stateFunc());
-  const state = proxyState as StoreType<T, G, A>;
+  const proxyState = proxy<S>(stateFunc());
+  const state = proxyState as StoreType<S, G, A>;
 
-  // Getters
   if (getters) {
-    derive(getters(state), {
+    derive(getters(state as S), {
       proxy: state,
     });
   }
 
-  // Add actions
   if (actions) {
     Object.assign(state, actions);
   }
 
-  // Return state with inferred getters
   return state;
 }
 
-export { tawr, defineStore, useSnapshot };
+export { defineStore, useSnapshot };
