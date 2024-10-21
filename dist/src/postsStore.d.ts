@@ -6,8 +6,4 @@ export declare const postsStore: {
     setUserId(this: {
         userId: null;
     }, userId: any): void;
-} & import('../lib').GettersControl<(state: {
-    userId: null;
-}) => {
-    posts: (get: <T extends object>(proxyObject: T) => T) => Promise<any>;
-}>;
+};

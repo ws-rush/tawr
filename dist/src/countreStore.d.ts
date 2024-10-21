@@ -31,11 +31,4 @@ export declare const counterStore: {
         first_name: string;
         last_name: string;
     }, first_name: string, last_name: string): void;
-} & import('../lib').GettersControl<(state: {
-    count: number;
-    first_name: string;
-    last_name: string;
-}) => {
-    doubleCount: (get: <T extends object>(proxyObject: T) => T) => number;
-    full_name: (get: <T extends object>(proxyObject: T) => T) => string;
-}>;
+};
