@@ -1,4 +1,6 @@
-import { useSnapshot } from 'valtio';
+type DeepWritable<T> = {
+    -readonly [P in keyof T]: DeepWritable<T[P]>;
+};
 type Get = <T extends object>(proxyObject: T) => T;
 type Getters = {
     [K: string]: (get: Get) => any;
@@ -18,4 +20,5 @@ type StoreType<S, G, A> = S & GetterReturnTypes<G> & A & {
     $invalidate: (keys: (keyof G)[]) => void;
 };
 declare function defineStore<S extends object, G extends Getters, A extends Actions>(storeDefinition: StoreDefinition<S, G, A>): StoreType<S, G, A>;
+declare const useSnapshot: <T extends object>(proxyObject: T) => DeepWritable<T>;
 export { defineStore, useSnapshot };
