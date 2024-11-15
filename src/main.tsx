@@ -3,24 +3,27 @@ import React, { Suspense, use } from "react";
 import { createRoot } from "react-dom/client";
 
 import { useSnapshot } from "../lib";
-import { counterStore } from "./countreStore";
+import { asyncInc, counterStore, dec, inc, incBy } from "./countreStore";
 import { postsStore } from "./postsStore";
 
 function Actions() {
   return (
     <div>
-      <button type="button" onClick={() => counterStore.inc()}>
+      <button type="button" onClick={() => inc()}>
         inc
       </button>
-      <button type="button" onClick={() => counterStore.dec()}>
+      <button type="button" onClick={() => asyncInc()}>
+        async inc
+      </button>
+      <button type="button" onClick={() => dec()}>
         dec
       </button>
-      <button type="button" onClick={() => counterStore.incBy(2)}>
+      <button type="button" onClick={() => incBy(2)}>
         inc by 2
       </button>
       <button
         type="button"
-        onClick={() => counterStore.rename("rush", "wusaby")}
+        onClick={() => counterStore.actions.rename("rush", "wusaby")}
       >
         chnage name
       </button>
@@ -60,7 +63,7 @@ function Posts() {
 
 createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
-    <input type="number" onChange={(e) => postsStore.setUserId(e.target.value)} defaultValue={0} />
+    <input type="number" onChange={(e) => postsStore.actions.setUserId(e.target.value)} defaultValue={0} />
     {/* <Suspense fallback={<p>Loading...</p>}> */}
       <Posts />
     {/* </Suspense> */}
@@ -69,3 +72,27 @@ createRoot(document.getElementById("app")!).render(
     <Actions />
   </React.StrictMode>
 );
+
+const unsubscribe = counterStore.$onAction(({
+  name,
+  args,
+  after,
+  onError,
+}) => {
+  const startTime = Date.now();
+  console.log(`Start "${name}" with params [${args.join(', ')}].`);
+
+  after((result) => {
+    console.log(
+      `Finished "${name}" after ${
+        Date.now() - startTime
+      }ms.\nResult: ${result}.`
+    );
+  });
+
+  onError((error) => {
+    console.warn(
+      `Failed "${name}" after ${Date.now() - startTime}ms.\nError: ${error}.`
+    );
+  });
+});

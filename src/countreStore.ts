@@ -18,6 +18,19 @@ export const counterStore = defineStore({
       inc() {
         this.count++
       },
+      async asyncInc() {
+        // rewrite this line to success and fail randomly
+        await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            if (Math.random() > 0.5) {
+              resolve(1)
+            } else {
+              reject()
+            }
+          }, 1000)
+        })
+        this.count++;
+      },
       dec() {
         this.count--
       },
@@ -33,3 +46,5 @@ export const counterStore = defineStore({
       }
     }
   })
+
+export const { inc, asyncInc, dec, incBy, decBy, rename } = counterStore.actions
