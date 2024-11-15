@@ -3,8 +3,16 @@ export declare const postsStore: {
 } & {
     posts: Promise<any>;
 } & {
-    setUserId(userId: any): void;
-} & {
+    actions: {
+        setUserId(userId: any): void;
+    };
     $underive: (keys: "posts"[]) => void;
     $invalidate: (keys: "posts"[]) => void;
+    $onAction: (subscriber: (context: {
+        name: string;
+        store: any;
+        args: any[];
+        after: (callback: (result: any) => void) => void;
+        onError: (callback: (error: any) => void) => void;
+    }) => void) => () => void;
 };

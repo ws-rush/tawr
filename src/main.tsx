@@ -1,4 +1,4 @@
-// @ts-expect-error handle later
+// @ts-expect-error handle later when react 19 released
 import React, { Suspense, use } from "react";
 import { createRoot } from "react-dom/client";
 

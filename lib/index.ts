@@ -44,6 +44,8 @@ type StoreType<S, G, A> = S &
     $onAction: (subscriber: ActionSubscriber) => () => void;
   };
 
+type UnderiveCompatible = { [key: string]: {} };
+
 function defineStore<S extends object, G extends Getters, A extends Actions>(
   storeDefinition: StoreDefinition<S, G, A>
 ): StoreType<S, G, A> {
@@ -68,22 +70,28 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
 
     state.$underive = (keys: (keyof G)[]) => {
       if (keys && keys.length > 0) {
-        underive(state, { keys: keys.map(String), delete: true });
+        underive(state as unknown as UnderiveCompatible, {
+          keys: keys.map(String),
+          delete: true,
+        });
       } else {
-        underive(state);
+        underive(state as unknown as UnderiveCompatible);
       }
     };
 
     state.$invalidate = (keys: (keyof G)[]) => {
       if (keys && keys.length > 0) {
-        underive(state, { keys: keys.map(String), delete: true });
+        underive(state as unknown as UnderiveCompatible, {
+          keys: keys.map(String),
+          delete: true,
+        });
         const gettersToDerive = {} as Partial<G>;
         for (const key of keys) {
           gettersToDerive[key] = getters[key];
         }
         derive(gettersToDerive as G, { proxy: state });
       } else {
-        underive(state);
+        underive(state as unknown as UnderiveCompatible);
         derive(getters, { proxy: state });
       }
     };
