@@ -1,4 +1,4 @@
-import { proxy, useSnapshot } from "valtio";
+import { proxy, useSnapshot as useSnapshotOrig } from "valtio";
 import { derive, underive } from "derive-valtio";
 
 // Action subscriber types
@@ -10,6 +10,10 @@ type ActionContext = {
   args: any[];
   after: (callback: (result: any) => void) => void;
   onError: (callback: (error: any) => void) => void;
+};
+
+type DeepWritable<T> = {
+  -readonly [P in keyof T]: DeepWritable<T[P]>;
 };
 
 type Get = <T extends object>(proxyObject: T) => T;
@@ -163,5 +167,10 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
 
   return state;
 }
+
+const useSnapshot = <T extends object>(proxyObject: T) => {
+  const snap = useSnapshotOrig(proxyObject);
+  return snap as DeepWritable<T>;
+};
 
 export { defineStore, useSnapshot };

@@ -73,7 +73,7 @@ createRoot(document.getElementById("app")!).render(
   </React.StrictMode>
 );
 
-const unsubscribe = counterStore.$onAction(({
+counterStore.$onAction(({
   name,
   args,
   after,
