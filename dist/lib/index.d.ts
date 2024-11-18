@@ -7,9 +7,6 @@ type ActionContext = {
     after: (callback: (result: any) => void) => void;
     onError: (callback: (error: any) => void) => void;
 };
-type DeepWritable<T> = T extends object ? {
-    -readonly [P in keyof T]: DeepWritable<T[P]>;
-} : T;
 type Get = <T extends object>(proxyObject: T) => T;
 type Getters = {
     [K: string]: (get: Get) => any;
@@ -35,6 +32,9 @@ type StoreType<S, G, A> = StoreState<S, G> & {
     $onAction: (subscriber: ActionSubscriber) => () => void;
 };
 declare function defineStore<S extends object, G extends Getters, A extends Actions<S, G>>(storeDefinition: StoreDefinition<S, G, A>): StoreType<S, G, A>;
+type DeepWritable<T> = {
+    -readonly [P in keyof T]: DeepWritable<T[P]>;
+};
 declare const useSnapshot: <T extends object>(proxyObject: T) => DeepWritable<T>;
 interface AwaitableProps<T> {
     resolve: Promise<T>;

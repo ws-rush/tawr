@@ -20,10 +20,6 @@ type ActionContext = {
   onError: (callback: (error: any) => void) => void;
 };
 
-type DeepWritable<T> = T extends object ? {
-  -readonly [P in keyof T]: DeepWritable<T[P]>;
-} : T;
-
 type Get = <T extends object>(proxyObject: T) => T;
 
 type Getters = {
@@ -186,10 +182,14 @@ function defineStore<
   return state;
 }
 
+type DeepWritable<T> = {
+  -readonly [P in keyof T]: DeepWritable<T[P]>
+}
+
 const useSnapshot = <T extends object>(proxyObject: T) => {
-  const snap = useSnapshotOrig(proxyObject);
-  return snap as DeepWritable<T>;
-};
+  const snap = useSnapshotOrig(proxyObject)
+  return snap as DeepWritable<T>
+}
 
 // Error Boundary Component
 class ErrorBoundary extends Component<{
