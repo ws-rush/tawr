@@ -7,9 +7,9 @@ type ActionContext = {
     after: (callback: (result: any) => void) => void;
     onError: (callback: (error: any) => void) => void;
 };
-type DeepWritable<T> = {
+type DeepWritable<T> = T extends object ? {
     -readonly [P in keyof T]: DeepWritable<T[P]>;
-};
+} : T;
 type Get = <T extends object>(proxyObject: T) => T;
 type Getters = {
     [K: string]: (get: Get) => any;
