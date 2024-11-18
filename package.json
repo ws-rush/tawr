@@ -12,7 +12,8 @@
   "exports": {
     ".": {
       "import": "./dist/tawr-state.js",
-      "require": "./dist/tawr-state.umd.cjs"
+      "require": "./dist/tawr-state.umd.cjs",
+      "types": "./dist/lib/index.d.ts"
     }
   },
   "scripts": {
