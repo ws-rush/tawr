@@ -1,7 +1,7 @@
 {
   "name": "tawr-state",
   "private": false,
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "files": [
     "dist"
@@ -10,16 +10,17 @@
   "module": "./dist/tawr-state.js",
   "types": "./dist/lib/index.d.ts",
   "exports": {
-		".": {
-			"import": "./dist/tawr-state.js",
-			"require": "./dist/tawr-state.umd.cjs"
-		}
-	},
+    ".": {
+      "import": "./dist/tawr-state.js",
+      "require": "./dist/tawr-state.umd.cjs"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build"
   },
   "devDependencies": {
+    "@types/node": "^22.9.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.2",
@@ -29,8 +30,8 @@
   },
   "dependencies": {
     "derive-valtio": "^0.2.0",
-    "valtio": "^2.0.0",
     "react": "rc",
-    "react-dom": "rc"
+    "react-dom": "rc",
+    "valtio": "^2.0.0"
   }
 }

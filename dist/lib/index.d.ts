@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 type ActionSubscriber = (context: ActionContext) => void;
 type ActionContext = {
     name: string;
@@ -31,4 +32,11 @@ type StoreType<S, G, A> = S & GetterReturnTypes<G> & {
 };
 declare function defineStore<S extends object, G extends Getters, A extends Actions>(storeDefinition: StoreDefinition<S, G, A>): StoreType<S, G, A>;
 declare const useSnapshot: <T extends object>(proxyObject: T) => DeepWritable<T>;
-export { defineStore, useSnapshot };
+interface AwaitableProps<T> {
+    resolve: Promise<T>;
+    fallback?: ReactNode;
+    error?: (error: Error) => ReactNode;
+    children: (value: T) => ReactNode;
+}
+declare function Awaitable<T>({ resolve, fallback, error, children }: AwaitableProps<T>): import("react/jsx-runtime").JSX.Element;
+export { defineStore, useSnapshot, Awaitable };

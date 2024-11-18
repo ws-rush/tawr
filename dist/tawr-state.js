@@ -1,65 +1,67 @@
-import { proxy as b, useSnapshot as y } from "valtio";
-import { derive as h, underive as i } from "derive-valtio";
-function A(p) {
+import { jsx as h, jsxs as E, Fragment as v } from "react/jsx-runtime";
+import { proxy as w, useSnapshot as A } from "valtio";
+import { derive as g, underive as f } from "derive-valtio";
+import { Suspense as C, Component as j, use as F } from "react";
+function T(s) {
   const {
-    state: d,
-    getters: g,
-    actions: m
-  } = p, t = b(d()), f = /* @__PURE__ */ new Set();
-  if (g) {
-    const o = g(t);
-    h(o, {
+    state: e,
+    getters: a,
+    actions: u
+  } = s, t = w(e()), d = /* @__PURE__ */ new Set();
+  if (a) {
+    const o = a(t);
+    g(o, {
       proxy: t
-    }), t.$underive = (r) => {
-      r && r.length > 0 ? i(t, {
-        keys: r.map(String),
+    }), t.$underive = (n) => {
+      n && n.length > 0 ? f(t, {
+        keys: n.map(String),
         delete: !0
-      }) : i(t);
-    }, t.$invalidate = (r) => {
-      if (r && r.length > 0) {
-        i(t, {
-          keys: r.map(String),
+      }) : f(t);
+    }, t.$invalidate = (n) => {
+      if (n && n.length > 0) {
+        f(t, {
+          keys: n.map(String),
           delete: !0
         });
-        const a = {};
-        for (const c of r)
-          a[c] = o[c];
-        h(a, { proxy: t });
+        const l = {};
+        for (const p of n)
+          l[p] = o[p];
+        g(l, { proxy: t });
       } else
-        i(t), h(o, { proxy: t });
+        f(t), g(o, { proxy: t });
     };
   }
-  if (t.$onAction = (o) => (f.add(o), () => {
-    f.delete(o);
-  }), m) {
+  if (t.$onAction = (o) => (d.add(o), () => {
+    d.delete(o);
+  }), u) {
     const o = {};
-    for (const [r, a] of Object.entries(m)) {
-      const c = (...S) => {
-        let u = [], l = [];
-        const x = {
-          name: r,
+    for (const [n, l] of Object.entries(u)) {
+      const p = (...S) => {
+        let m = [], b = [];
+        const y = {
+          name: n,
           store: t,
           args: S,
-          after: (e) => {
-            u.push(e);
+          after: (r) => {
+            m.push(r);
           },
-          onError: (e) => {
-            l.push(e);
+          onError: (r) => {
+            b.push(r);
           }
         };
-        f.forEach((e) => {
-          e(x);
+        d.forEach((r) => {
+          r(y);
         });
-        let n;
+        let c;
         try {
-          return n = a.apply(t, S), n instanceof Promise ? n.then((e) => (u.forEach((s) => s(e)), e)).catch((e) => {
-            throw l.forEach((s) => s(e)), e;
-          }) : (u.forEach((e) => e(n)), n);
-        } catch (e) {
-          throw l.forEach((s) => s(e)), e;
+          return c = l.apply(t, S), c instanceof Promise ? c.then((r) => (m.forEach((i) => i(r)), r)).catch((r) => {
+            throw b.forEach((i) => i(r)), r;
+          }) : (m.forEach((r) => r(c)), c);
+        } catch (r) {
+          throw b.forEach((i) => i(r)), r;
         }
       };
-      o[r] = c;
+      o[n] = p;
     }
     Object.defineProperty(t, "actions", {
       value: o,
@@ -69,8 +71,47 @@ function A(p) {
   }
   return t;
 }
-const $ = (p) => y(p);
+const q = (s) => A(s);
+class $ extends j {
+  constructor(e) {
+    super(e), this.state = { error: null };
+  }
+  static getDerivedStateFromError(e) {
+    return { error: e };
+  }
+  componentDidCatch(e, a) {
+    console.error("Error caught by boundary:", e, a);
+  }
+  render() {
+    return this.state.error ? this.props.fallback(this.state.error) : this.props.children;
+  }
+}
+function D({
+  resolve: s,
+  children: e
+}) {
+  const a = F(s);
+  return /* @__PURE__ */ h(v, { children: e(a) });
+}
+function z({
+  resolve: s,
+  fallback: e = null,
+  error: a = (x) => /* @__PURE__ */ E("div", { children: [
+    "Error: ",
+    x.message
+  ] }),
+  children: u
+}) {
+  return /* @__PURE__ */ h($, { fallback: a, children: /* @__PURE__ */ h(C, { fallback: e, children: /* @__PURE__ */ h(
+    D,
+    {
+      resolve: s,
+      children: u
+    }
+  ) }) });
+}
 export {
-  A as defineStore,
-  $ as useSnapshot
+  z as Awaitable,
+  T as defineStore,
+  q as useSnapshot
 };

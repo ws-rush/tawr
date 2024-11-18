@@ -52,21 +52,26 @@ function Count() {
 function Posts() {
   const snap = useSnapshot(postsStore);
 
+  // check if it promise or not
+  const posts = snap.cachedPosts instanceof Promise ?  use(snap.cachedPosts) : snap.cachedPosts;
+
   return (
     <ul>
-      {use(snap.posts)?.map((post: any) => (
-        <li key={post.id}>{post.title}</li>
-      ))}
+      {
+        // check if it promise or not
+        posts.map((post: any) => <li key={post.id}>{post.title}</li>)
+      }
+      {/* <Awaitable resolve={snap.posts} fallback={<p>loading ...</p>} error={(e) => <p>{e.message}</p>} children={(posts) => posts.map((post) => <li key={post.id}>{post.title}</li>)} /> */}
     </ul>
   );
 }
 
 createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
-    <input type="number" onChange={(e) => postsStore.actions.setUserId(e.target.value)} defaultValue={0} />
-    {/* <Suspense fallback={<p>Loading...</p>}> */}
+    <input type="number" onChange={(e) => postsStore.actions.setUserId(e.target.value)} defaultValue={1} />
+    <Suspense fallback={<p>loading ...</p>}>
       <Posts />
-    {/* </Suspense> */}
+    </Suspense>
     <Name />
     <Count />
     <Actions />

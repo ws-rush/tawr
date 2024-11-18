@@ -1,13 +1,13 @@
 export declare const postsStore: {
     userId: null;
 } & {
-    posts: Promise<any>;
+    cachedPosts: any;
 } & {
     actions: {
         setUserId(userId: any): void;
     };
-    $underive: (keys: "posts"[]) => void;
-    $invalidate: (keys: "posts"[]) => void;
+    $underive: (keys: "cachedPosts"[]) => void;
+    $invalidate: (keys: "cachedPosts"[]) => void;
     $onAction: (subscriber: (context: {
         name: string;
         store: any;
