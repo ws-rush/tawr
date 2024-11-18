@@ -1,5 +1,13 @@
 import { proxy, useSnapshot as useSnapshotOrig } from "valtio";
 import { derive, underive } from "derive-valtio";
+import { 
+  ReactNode, 
+  Suspense, 
+  // @ts-expect-error handle later when react 19 released
+  use, 
+  Component, 
+  ErrorInfo 
+} from 'react';
 
 // Action subscriber types
 type ActionSubscriber = (context: ActionContext) => void;
@@ -22,31 +30,44 @@ type Getters = {
   [K: string]: (get: Get) => any;
 };
 
-type Actions = Record<string, (...args: any[]) => any>;
-
 type GetterReturnTypes<G> = {
   [K in keyof G]: G[K] extends (get: any) => infer R ? R : never;
 };
 
-type ThisForActions<S, G, A> = S & GetterReturnTypes<G> & A;
+type StoreState<S, G> = S & GetterReturnTypes<G>;
 
-type StoreDefinition<S, G extends Getters, A> = {
-  state: () => S;
-  getters?: (state: S) => G;
-  actions?: A & ThisType<ThisForActions<S, G, A>>;
+type Actions<S, G> = {
+  [K: string]: (this: StoreState<S, G>, ...args: any[]) => any;
 };
 
-type StoreType<S, G, A> = S &
-  GetterReturnTypes<G> & {
-    actions: A;
-    $underive: (keys: (keyof G)[]) => void;
-    $invalidate: (keys: (keyof G)[]) => void;
-    $onAction: (subscriber: ActionSubscriber) => () => void;
+type StoreDefinition<
+  S extends object,
+  G extends Getters,
+  A extends Actions<S, G>
+> = {
+  state: () => S;
+  getters?: (state: S) => G;
+  actions?: A;
+};
+
+type StoreType<S, G, A> = StoreState<S, G> & {
+  actions: {
+    [K in keyof A]: A[K] extends (this: any, ...args: infer P) => infer R
+      ? (...args: P) => R
+      : never;
   };
+  $underive: (keys: (keyof G)[]) => void;
+  $invalidate: (keys: (keyof G)[]) => void;
+  $onAction: (subscriber: ActionSubscriber) => () => void;
+};
 
 type UnderiveCompatible = { [key: string]: {} };
 
-function defineStore<S extends object, G extends Getters, A extends Actions>(
+function defineStore<
+  S extends object,
+  G extends Getters,
+  A extends Actions<S, G>
+>(
   storeDefinition: StoreDefinition<S, G, A>
 ): StoreType<S, G, A> {
   const {
@@ -97,7 +118,6 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
     };
   }
 
-  // Add $onAction method
   state.$onAction = (subscriber: ActionSubscriber) => {
     subscribers.add(subscriber);
     return () => {
@@ -106,13 +126,13 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
   };
 
   if (rawActions) {
-    const wrappedActions = {} as A;
-  
+    const wrappedActions = {} as StoreType<S, G, A>['actions'];
+
     for (const [name, action] of Object.entries(rawActions)) {
-      const wrappedAction = (...args: Parameters<typeof action>) => {
+      const wrappedAction = (...args: any[]) => {
         let afterCallbacks: ((result: any) => void)[] = [];
         let errorCallbacks: ((error: any) => void)[] = [];
-  
+
         const actionContext: ActionContext = {
           name,
           store: state,
@@ -124,15 +144,15 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
             errorCallbacks.push(callback);
           },
         };
-  
+
         subscribers.forEach((subscriber) => {
           subscriber(actionContext);
         });
-  
+
         let result: any;
         try {
           result = action.apply(state, args);
-  
+
           if (result instanceof Promise) {
             return result
               .then((value) => {
@@ -144,7 +164,7 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
                 throw error;
               });
           }
-  
+
           afterCallbacks.forEach((cb) => cb(result));
           return result;
         } catch (error) {
@@ -152,50 +172,24 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
           throw error;
         }
       };
-  
+
       (wrappedActions as any)[name] = wrappedAction;
     }
-  
-    // Only add actions as a property of the store, don't assign to state directly
+
     Object.defineProperty(state, "actions", {
       value: wrappedActions,
       enumerable: true,
       configurable: true,
     });
-  
-    // Remove this line to prevent adding actions directly to the state
-    // Object.assign(state, wrappedActions);
   }
-  
 
   return state;
 }
-
-// ========================================================
 
 const useSnapshot = <T extends object>(proxyObject: T) => {
   const snap = useSnapshotOrig(proxyObject);
   return snap as DeepWritable<T>;
 };
-
-// =========================================================
-
-// Awaitable.tsx
-import { 
-  ReactNode, 
-  Suspense, 
-  // @ts-expect-error handle it when react 19 released
-  use, 
-  Component, 
-  ErrorInfo 
-} from 'react';
-
-interface AwaitableProps<T> {
-  resolve: Promise<T>;
-  fallback?: ReactNode;
-  error?: (error: Error) => ReactNode;
-  children: (value: T) => ReactNode;
-}
 
 // Error Boundary Component
 class ErrorBoundary extends Component<{
@@ -233,6 +227,13 @@ function AwaitableContent<T>({
 }: Omit<AwaitableProps<T>, 'fallback' | 'error'>) {
   const value = use(resolve);
   return <>{children(value)}</>;
+}
+
+interface AwaitableProps<T> {
+  resolve: Promise<T>;
+  fallback?: ReactNode;
+  error?: (error: Error) => ReactNode;
+  children: (value: T) => ReactNode;
 }
 
 // Main Awaitable component

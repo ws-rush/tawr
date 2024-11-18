@@ -4,7 +4,7 @@ export declare const postsStore: {
     cachedPosts: any;
 } & {
     actions: {
-        setUserId(userId: any): void;
+        setUserId: (userId: any) => void;
     };
     $underive: (keys: "cachedPosts"[]) => void;
     $invalidate: (keys: "cachedPosts"[]) => void;

@@ -7,12 +7,12 @@ export declare const counterStore: {
     full_name: string;
 } & {
     actions: {
-        inc(): void;
-        asyncInc(): Promise<void>;
-        dec(): void;
-        incBy(num: number): void;
-        decBy(num: number): void;
-        rename(first_name: string, last_name: string): void;
+        inc: () => void;
+        asyncInc: () => Promise<void>;
+        dec: () => void;
+        incBy: (num: number) => void;
+        decBy: (num: number) => void;
+        rename: (first_name: string, last_name: string) => void;
     };
     $underive: (keys: ("doubleCount" | "full_name")[]) => void;
     $invalidate: (keys: ("doubleCount" | "full_name")[]) => void;
