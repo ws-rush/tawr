@@ -7,69 +7,69 @@ function T(s) {
     state: e,
     getters: a,
     actions: u
-  } = s, t = w(e()), d = /* @__PURE__ */ new Set();
+  } = s, r = w(e()), d = /* @__PURE__ */ new Set();
   if (a) {
-    const o = a(t);
-    g(o, {
-      proxy: t
-    }), t.$underive = (n) => {
-      n && n.length > 0 ? f(t, {
-        keys: n.map(String),
+    const n = a(r);
+    g(n, {
+      proxy: r
+    }), r.$underive = (o) => {
+      o && o.length > 0 ? f(r, {
+        keys: o.map(String),
         delete: !0
-      }) : f(t);
-    }, t.$invalidate = (n) => {
-      if (n && n.length > 0) {
-        f(t, {
-          keys: n.map(String),
+      }) : f(r);
+    }, r.$invalidate = (o) => {
+      if (o && o.length > 0) {
+        f(r, {
+          keys: o.map(String),
           delete: !0
         });
         const l = {};
-        for (const p of n)
-          l[p] = o[p];
-        g(l, { proxy: t });
+        for (const p of o)
+          l[p] = n[p];
+        g(l, { proxy: r });
       } else
-        f(t), g(o, { proxy: t });
+        f(r), g(n, { proxy: r });
     };
   }
-  if (t.$onAction = (o) => (d.add(o), () => {
-    d.delete(o);
+  if (r.$onAction = (n) => (d.add(n), () => {
+    d.delete(n);
   }), u) {
-    const o = {};
-    for (const [n, l] of Object.entries(u)) {
+    const n = {};
+    for (const [o, l] of Object.entries(u)) {
       const p = (...S) => {
         let m = [], b = [];
         const y = {
-          name: n,
-          store: t,
+          name: o,
+          store: r,
           args: S,
-          after: (r) => {
-            m.push(r);
+          after: (t) => {
+            m.push(t);
           },
-          onError: (r) => {
-            b.push(r);
+          onError: (t) => {
+            b.push(t);
           }
         };
-        d.forEach((r) => {
-          r(y);
+        d.forEach((t) => {
+          t(y);
         });
         let c;
         try {
-          return c = l.apply(t, S), c instanceof Promise ? c.then((r) => (m.forEach((i) => i(r)), r)).catch((r) => {
-            throw b.forEach((i) => i(r)), r;
-          }) : (m.forEach((r) => r(c)), c);
-        } catch (r) {
-          throw b.forEach((i) => i(r)), r;
+          return c = l.apply(r, S), c instanceof Promise ? c.then((t) => (m.forEach((i) => i(t)), t)).catch((t) => {
+            throw b.forEach((i) => i(t)), t;
+          }) : (m.forEach((t) => t(c)), c);
+        } catch (t) {
+          throw b.forEach((i) => i(t)), t;
         }
       };
-      o[n] = p;
+      n[o] = p;
     }
-    Object.defineProperty(t, "actions", {
-      value: o,
+    Object.defineProperty(r, "actions", {
+      value: n,
       enumerable: !0,
       configurable: !0
-    }), Object.assign(t, o);
+    });
   }
-  return t;
+  return r;
 }
 const q = (s) => A(s);
 class $ extends j {

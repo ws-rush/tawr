@@ -105,15 +105,14 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
     };
   };
 
-  // Wrap actions with subscription handling
   if (rawActions) {
     const wrappedActions = {} as A;
-
+  
     for (const [name, action] of Object.entries(rawActions)) {
       const wrappedAction = (...args: Parameters<typeof action>) => {
         let afterCallbacks: ((result: any) => void)[] = [];
         let errorCallbacks: ((error: any) => void)[] = [];
-
+  
         const actionContext: ActionContext = {
           name,
           store: state,
@@ -125,17 +124,15 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
             errorCallbacks.push(callback);
           },
         };
-
-        // Notify subscribers before action
+  
         subscribers.forEach((subscriber) => {
           subscriber(actionContext);
         });
-
+  
         let result: any;
         try {
           result = action.apply(state, args);
-
-          // Handle promise results
+  
           if (result instanceof Promise) {
             return result
               .then((value) => {
@@ -147,31 +144,29 @@ function defineStore<S extends object, G extends Getters, A extends Actions>(
                 throw error;
               });
           }
-
-          // Handle synchronous results
+  
           afterCallbacks.forEach((cb) => cb(result));
           return result;
         } catch (error) {
-          // Handle synchronous errors
           errorCallbacks.forEach((cb) => cb(error));
           throw error;
         }
       };
-
-      // Use type assertion to assign the wrapped action
+  
       (wrappedActions as any)[name] = wrappedAction;
     }
-
-    // Add actions as a property of the store
+  
+    // Only add actions as a property of the store, don't assign to state directly
     Object.defineProperty(state, "actions", {
       value: wrappedActions,
       enumerable: true,
       configurable: true,
     });
-
-    // Also add actions directly to the store
-    Object.assign(state, wrappedActions);
+  
+    // Remove this line to prevent adding actions directly to the state
+    // Object.assign(state, wrappedActions);
   }
+  
 
   return state;
 }
