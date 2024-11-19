@@ -188,7 +188,35 @@ type DeepWritable<T> = {
 
 const useSnapshot = <T extends object>(proxyObject: T) => {
   const snap = useSnapshotOrig(proxyObject)
-  return snap as DeepWritable<T>
+  
+  // Helper function to check if an object is a Date-like object
+  const isDateLike = (obj: any): boolean => {
+    return obj && 
+           typeof obj === 'object' && 
+           'toISOString' in obj &&
+           'getTime' in obj;
+  }
+
+  // Helper function to recursively transform the snapshot
+  const transformSnapshot = (obj: any): any => {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    if (isDateLike(obj)) {
+      return new Date(obj.valueOf());
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(transformSnapshot);
+    }
+
+    const transformed = { ...obj };
+    for (const key in transformed) {
+      transformed[key] = transformSnapshot(transformed[key]);
+    }
+    return transformed;
+  }
+
+  return transformSnapshot(snap) as DeepWritable<T>;
 }
 
 // Error Boundary Component

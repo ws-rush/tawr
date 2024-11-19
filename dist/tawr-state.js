@@ -1,117 +1,130 @@
-import { jsx as h, jsxs as E, Fragment as v } from "react/jsx-runtime";
-import { proxy as w, useSnapshot as A } from "valtio";
-import { derive as g, underive as f } from "derive-valtio";
-import { Suspense as C, Component as j, use as F } from "react";
-function T(s) {
+import { jsx as m, jsxs as v, Fragment as w } from "react/jsx-runtime";
+import { proxy as A, useSnapshot as C } from "valtio";
+import { derive as S, underive as d } from "derive-valtio";
+import { Suspense as D, Component as b, use as k } from "react";
+function I(c) {
   const {
-    state: e,
-    getters: a,
-    actions: u
-  } = s, r = w(e()), d = /* @__PURE__ */ new Set();
-  if (a) {
-    const n = a(r);
-    g(n, {
-      proxy: r
-    }), r.$underive = (o) => {
-      o && o.length > 0 ? f(r, {
+    state: n,
+    getters: s,
+    actions: i
+  } = c, t = A(n()), u = /* @__PURE__ */ new Set();
+  if (s) {
+    const a = s(t);
+    S(a, {
+      proxy: t
+    }), t.$underive = (o) => {
+      o && o.length > 0 ? d(t, {
         keys: o.map(String),
         delete: !0
-      }) : f(r);
-    }, r.$invalidate = (o) => {
+      }) : d(t);
+    }, t.$invalidate = (o) => {
       if (o && o.length > 0) {
-        f(r, {
+        d(t, {
           keys: o.map(String),
           delete: !0
         });
-        const l = {};
-        for (const p of o)
-          l[p] = n[p];
-        g(l, { proxy: r });
+        const p = {};
+        for (const h of o)
+          p[h] = a[h];
+        S(p, { proxy: t });
       } else
-        f(r), g(n, { proxy: r });
+        d(t), S(a, { proxy: t });
     };
   }
-  if (r.$onAction = (n) => (d.add(n), () => {
-    d.delete(n);
-  }), u) {
-    const n = {};
-    for (const [o, l] of Object.entries(u)) {
-      const p = (...S) => {
-        let m = [], b = [];
-        const y = {
+  if (t.$onAction = (a) => (u.add(a), () => {
+    u.delete(a);
+  }), i) {
+    const a = {};
+    for (const [o, p] of Object.entries(i)) {
+      const h = (...x) => {
+        let y = [], g = [];
+        const E = {
           name: o,
-          store: r,
-          args: S,
-          after: (t) => {
-            m.push(t);
+          store: t,
+          args: x,
+          after: (e) => {
+            y.push(e);
           },
-          onError: (t) => {
-            b.push(t);
+          onError: (e) => {
+            g.push(e);
           }
         };
-        d.forEach((t) => {
-          t(y);
+        u.forEach((e) => {
+          e(E);
         });
-        let c;
+        let f;
         try {
-          return c = l.apply(r, S), c instanceof Promise ? c.then((t) => (m.forEach((i) => i(t)), t)).catch((t) => {
-            throw b.forEach((i) => i(t)), t;
-          }) : (m.forEach((t) => t(c)), c);
-        } catch (t) {
-          throw b.forEach((i) => i(t)), t;
+          return f = p.apply(t, x), f instanceof Promise ? f.then((e) => (y.forEach((l) => l(e)), e)).catch((e) => {
+            throw g.forEach((l) => l(e)), e;
+          }) : (y.forEach((e) => e(f)), f);
+        } catch (e) {
+          throw g.forEach((l) => l(e)), e;
         }
       };
-      n[o] = p;
+      a[o] = h;
     }
-    Object.defineProperty(r, "actions", {
-      value: n,
+    Object.defineProperty(t, "actions", {
+      value: a,
       enumerable: !0,
       configurable: !0
     });
   }
-  return r;
+  return t;
 }
-const q = (s) => A(s);
-class $ extends j {
-  constructor(e) {
-    super(e), this.state = { error: null };
+const L = (c) => {
+  const n = C(c), s = (r) => r && typeof r == "object" && "toISOString" in r && "getTime" in r, i = (r) => {
+    if (!r || typeof r != "object") return r;
+    if (s(r))
+      return new Date(r.valueOf());
+    if (Array.isArray(r))
+      return r.map(i);
+    const t = { ...r };
+    for (const u in t)
+      t[u] = i(t[u]);
+    return t;
+  };
+  return i(n);
+};
+class F extends b {
+  constructor(n) {
+    super(n), this.state = { error: null };
   }
-  static getDerivedStateFromError(e) {
-    return { error: e };
+  static getDerivedStateFromError(n) {
+    return { error: n };
   }
-  componentDidCatch(e, a) {
-    console.error("Error caught by boundary:", e, a);
+  componentDidCatch(n, s) {
+    console.error("Error caught by boundary:", n, s);
   }
   render() {
     return this.state.error ? this.props.fallback(this.state.error) : this.props.children;
   }
 }
-function D({
-  resolve: s,
-  children: e
+function O({
+  resolve: c,
+  children: n
 }) {
-  const a = F(s);
-  return /* @__PURE__ */ h(v, { children: e(a) });
+  const s = k(c);
+  return /* @__PURE__ */ m(w, { children: n(s) });
 }
-function z({
-  resolve: s,
-  fallback: e = null,
-  error: a = (x) => /* @__PURE__ */ E("div", { children: [
+function q({
+  resolve: c,
+  fallback: n = null,
+  error: s = (r) => /* @__PURE__ */ v("div", { children: [
     "Error: ",
-    x.message
+    r.message
   ] }),
-  children: u
+  children: i
 }) {
-  return /* @__PURE__ */ h($, { fallback: a, children: /* @__PURE__ */ h(C, { fallback: e, children: /* @__PURE__ */ h(
-    D,
+  return /* @__PURE__ */ m(F, { fallback: s, children: /* @__PURE__ */ m(D, { fallback: n, children: /* @__PURE__ */ m(
+    O,
     {
-      resolve: s,
-      children: u
+      resolve: c,
+      children: i
     }
   ) }) });
 }
 export {
-  z as Awaitable,
-  T as defineStore,
-  q as useSnapshot
+  q as Awaitable,
+  I as defineStore,
+  L as useSnapshot
 };
