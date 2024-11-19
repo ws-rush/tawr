@@ -12,7 +12,7 @@ export default defineConfig({
       fileName: 'tawr-state'
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime', 'valtio', 'derive-valtio']
+      external: ['react', 'react-dom', 'react/jsx-runtime']
     }
   }
 })

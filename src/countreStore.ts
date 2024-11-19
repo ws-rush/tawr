@@ -8,15 +8,13 @@ export const counterStore = defineStore({
         last_name: 'doe'
       }
     },
-    getters(state) {
-      return {
-        doubleCount: (get) => get(state).count * 2,
-        full_name: (get) => `${get(state).first_name} ${get(state).last_name}`
-      }
+    getters: {
+      doubleCount: (state) => state.count * 2,
+      full_name: (state) => `${state.first_name} ${state.last_name}`
     },
     actions: {
       inc() {
-        this.count++
+        counterStore.count++
       },
       async asyncInc() {
         // rewrite this line to success and fail randomly
@@ -29,20 +27,20 @@ export const counterStore = defineStore({
             }
           }, 1000)
         })
-        this.count++;
+        counterStore.count++
       },
       dec() {
-        this.count--
+        counterStore.count--
       },
       incBy(num: number) {
-        this.count += num
+        counterStore.count += num
       },
       decBy(num: number) {
-        this.count += num
+        counterStore.count += num
       },
       rename(first_name: string, last_name: string) {
-        this.first_name = first_name
-        this.last_name = last_name
+        counterStore.first_name = first_name
+        counterStore.last_name = last_name
       }
     }
   })

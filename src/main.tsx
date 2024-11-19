@@ -27,9 +27,9 @@ function Actions() {
       >
         chnage name
       </button>
-
+{/* 
       <button type="button" onClick={() => counterStore.$underive(['doubleCount'])}>$underive double_count</button>
-      <button type="button" onClick={() => counterStore.$invalidate(['doubleCount'])}>$invalidate double_count</button>
+      <button type="button" onClick={() => counterStore.$invalidate(['doubleCount'])}>$invalidate double_count</button> */}
     </div>
   );
 }
@@ -53,7 +53,7 @@ function Posts() {
   const snap = useSnapshot(postsStore);
 
   // check if it promise or not
-  const posts = snap.cachedPosts instanceof Promise ?  use(snap.cachedPosts) : snap.cachedPosts;
+  const posts = snap.posts instanceof Promise ?  use(snap.posts) : snap.posts;
 
   return (
     <ul>
@@ -78,26 +78,26 @@ createRoot(document.getElementById("app")!).render(
   </React.StrictMode>
 );
 
-counterStore.$onAction(({
-  name,
-  args,
-  after,
-  onError,
-}) => {
-  const startTime = Date.now();
-  console.log(`Start "${name}" with params [${args.join(', ')}].`);
+// counterStore.$onAction(({
+//   name,
+//   args,
+//   after,
+//   onError,
+// }) => {
+//   const startTime = Date.now();
+//   console.log(`Start "${name}" with params [${args.join(', ')}].`);
 
-  after((result) => {
-    console.log(
-      `Finished "${name}" after ${
-        Date.now() - startTime
-      }ms.\nResult: ${result}.`
-    );
-  });
+//   after((result) => {
+//     console.log(
+//       `Finished "${name}" after ${
+//         Date.now() - startTime
+//       }ms.\nResult: ${result}.`
+//     );
+//   });
 
-  onError((error) => {
-    console.warn(
-      `Failed "${name}" after ${Date.now() - startTime}ms.\nError: ${error}.`
-    );
-  });
-});
+//   onError((error) => {
+//     console.warn(
+//       `Failed "${name}" after ${Date.now() - startTime}ms.\nError: ${error}.`
+//     );
+//   });
+// });

@@ -8,18 +8,15 @@ importers:
 
   .:
     dependencies:
-      derive-valtio:
-        specifier: ^0.2.0
-        version: 0.2.0(valtio@2.0.0(@types/react@18.3.11)(react@19.0.0-rc-65a56d0e-20241020))
+      '@vue/reactivity':
+        specifier: ^3.5.13
+        version: 3.5.13
       react:
         specifier: rc
         version: 19.0.0-rc-65a56d0e-20241020
       react-dom:
         specifier: rc
         version: 19.0.0-rc-65a56d0e-20241020(react@19.0.0-rc-65a56d0e-20241020)
-      valtio:
-        specifier: ^2.0.0
-        version: 2.0.0(@types/react@18.3.11)(react@19.0.0-rc-65a56d0e-20241020)
     devDependencies:
       '@types/node':
         specifier: ^22.9.0
@@ -478,8 +475,14 @@ packages:
       typescript:
         optional: true
 
+  '@vue/reactivity@3.5.13':
+    resolution: {integrity: sha512-NaCwtw8o48B9I6L1zl2p41OHo/2Z4wqYGGIK1Khu5T7yxrn+ATOixn/Udn2m+6kZKB/J7cuT9DbWWhRxqixACg==}
+
   '@vue/shared@3.5.12':
     resolution: {integrity: sha512-L2RPSAwUFbgZH20etwrXyVyCBu9OxRSi8T/38QsvnkJyvq2LufW2lDCOzm7t/U9C1mkhJGWYfCuFBCmIuNivrg==}
+
+  '@vue/shared@3.5.13':
+    resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
 
   acorn@8.12.1:
     resolution: {integrity: sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==}
@@ -571,11 +574,6 @@ packages:
     peerDependenciesMeta:
       supports-color:
         optional: true
-
-  derive-valtio@0.2.0:
-    resolution: {integrity: sha512-6slhaFHtfaL3t5dLYaQt6s4G2xZymhu0Ktdl7OMeVk8+46RgR8ft6FL0Tr4F31W+yPH03nJe1SSP4JFy2hSMRA==}
-    peerDependencies:
-      valtio: '>=2.0.0-rc.0'
 
   electron-to-chromium@1.5.36:
     resolution: {integrity: sha512-HYTX8tKge/VNp6FGO+f/uVDmUkq+cEfcxYhKf15Akc4M5yxt5YmorwlAitKWjWhWQnKcDRBAQKXkhqqXMqcrjw==}
@@ -739,9 +737,6 @@ packages:
     resolution: {integrity: sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  proxy-compare@3.0.0:
-    resolution: {integrity: sha512-y44MCkgtZUCT9tZGuE278fB7PWVf7fRYy0vbRXAts2o5F0EfC4fIQrvQQGBJo1WJbFcVLXzApOscyJuZqHQc1w==}
-
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -847,18 +842,6 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
-
-  valtio@2.0.0:
-    resolution: {integrity: sha512-SzUU5UUK/vBRfHWXihwkJE55YNj8zhOkzxPOexcz0xIIT6Oux5VLynCmzyME2bYuEWcktW2NTaaLbpUydEsHiw==}
-    engines: {node: '>=12.20.0'}
-    peerDependencies:
-      '@types/react': '>=18.0.0'
-      react: '>=18.0.0'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      react:
-        optional: true
 
   vite-plugin-dts@4.2.4:
     resolution: {integrity: sha512-REcYoxO90Pi8c0P1J7XAa/nVwNVGkX2eYkBEIfFSfcKE4g1W8sB0R23a7SU3aLEMfdOdb0SVHq3JlJ+Qb6gjgA==}
@@ -1346,7 +1329,13 @@ snapshots:
     optionalDependencies:
       typescript: 5.6.3
 
+  '@vue/reactivity@3.5.13':
+    dependencies:
+      '@vue/shared': 3.5.13
+
   '@vue/shared@3.5.12': {}
+
+  '@vue/shared@3.5.13': {}
 
   acorn@8.12.1: {}
 
@@ -1429,10 +1418,6 @@ snapshots:
   debug@4.3.7:
     dependencies:
       ms: 2.1.3
-
-  derive-valtio@0.2.0(valtio@2.0.0(@types/react@18.3.11)(react@19.0.0-rc-65a56d0e-20241020)):
-    dependencies:
-      valtio: 2.0.0(@types/react@18.3.11)(react@19.0.0-rc-65a56d0e-20241020)
 
   electron-to-chromium@1.5.36: {}
 
@@ -1585,8 +1570,6 @@ snapshots:
       picocolors: 1.1.0
       source-map-js: 1.2.1
 
-  proxy-compare@3.0.0: {}
-
   punycode@2.3.1: {}
 
   react-dom@19.0.0-rc-65a56d0e-20241020(react@19.0.0-rc-65a56d0e-20241020):
@@ -1677,13 +1660,6 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
-
-  valtio@2.0.0(@types/react@18.3.11)(react@19.0.0-rc-65a56d0e-20241020):
-    dependencies:
-      proxy-compare: 3.0.0
-    optionalDependencies:
-      '@types/react': 18.3.11
-      react: 19.0.0-rc-65a56d0e-20241020
 
   vite-plugin-dts@4.2.4(@types/node@22.9.0)(rollup@4.24.0)(typescript@5.6.3)(vite@5.4.8(@types/node@22.9.0)):
     dependencies:
