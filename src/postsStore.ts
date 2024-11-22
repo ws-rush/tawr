@@ -6,12 +6,12 @@ import { defineStore } from "../lib";
 export const postsStore = defineStore({
   state() {
     return {
-      userId: null,
+      userId: 0,
     };
   },
   getters: {
-    posts: (state) => {
-      const userId = state.userId;
+    posts: () => {
+      const userId = postsStore.userId;
       return fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId ? userId : 1}`)
       .then((response) => response.json())
     },
@@ -43,7 +43,7 @@ export const postsStore = defineStore({
     // },
   },
   actions: {
-    setUserId(userId) {
+    setUserId(userId: number) {
       postsStore.userId = userId;
     },
   },
