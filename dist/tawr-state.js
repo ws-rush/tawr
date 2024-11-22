@@ -965,7 +965,7 @@ function Pt(e) {
       enumerable: !0
     });
   }), e.getters && Object.entries(e.getters).forEach(([n, i]) => {
-    const o = Ot(() => i(r));
+    const o = Ot(() => i(s));
     Object.defineProperty(s, n, {
       get: () => o.value,
       enumerable: !0
@@ -973,7 +973,7 @@ function Pt(e) {
   }), e.actions) {
     const n = {};
     Object.entries(e.actions).forEach(([i, o]) => {
-      n[i] = o.bind(s);
+      n[i] = o.bind(null);
     }), s.actions = n;
   }
   return s;

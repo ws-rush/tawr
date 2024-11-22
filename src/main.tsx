@@ -43,6 +43,8 @@ function Name() {
 function Count() {
   const counter = useSnapshot(counterStore);
 
+  counter.count
+
   return <>
   <p>{counter.count}</p>
   <p>{counter.doubleCount}</p>
@@ -68,7 +70,7 @@ function Posts() {
 
 createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
-    <input type="number" onChange={(e) => postsStore.actions.setUserId(e.target.value)} defaultValue={1} />
+    <input type="number" onChange={(e) => postsStore.actions.setUserId(Number(e.target.value))} defaultValue={1} />
     <Suspense fallback={<p>loading ...</p>}>
       <Posts />
     </Suspense>

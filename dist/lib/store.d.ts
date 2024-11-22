@@ -1,7 +1,7 @@
-type Getters<T> = Record<string, (state: T) => any>;
+type Getters<T> = Record<string, (store: T & GettersReturn<Getters<T>>) => any>;
 type Actions = Record<string, (...args: any[]) => any>;
-type GettersReturn<G extends Getters<any>> = {
-    [K in keyof G]: ReturnType<G[K]>;
+type GettersReturn<G> = {
+    [K in keyof G]: G[K] extends (...args: any[]) => any ? ReturnType<G[K]> : never;
 };
 type State<T> = {
     [K in keyof T]: T[K];
@@ -15,5 +15,5 @@ type Store<T extends object, G extends Getters<T>, A extends Actions> = State<T>
     $state: T;
     actions: A;
 };
-export declare function defineStore<T extends object, G extends Getters<T>, A extends Actions>(definition: StoreDefinition<T, G, A>): Store<T, G, A>;
+export declare function defineStore<T extends object, G extends Getters<T> = {}, A extends Actions = {}>(definition: StoreDefinition<T, G, A>): Store<T, G, A>;
 export {};

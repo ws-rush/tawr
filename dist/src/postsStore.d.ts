@@ -1,12 +1,12 @@
 export declare const postsStore: {
-    userId: null;
+    userId: number;
 } & {
     posts: Promise<any>;
 } & {
     $state: {
-        userId: null;
+        userId: number;
     };
     actions: {
-        setUserId(userId: any): void;
+        setUserId(userId: number): void;
     };
 };
