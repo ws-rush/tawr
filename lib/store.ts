@@ -4,16 +4,17 @@ type Getters<T> = Record<string, (store: T & GettersReturn<Getters<T>>) => any>;
 type Actions = Record<string, (...args: any[]) => any>;
 
 // Helper types to infer return types of getters and actions
+// Enhanced typing for better type inference
 type GettersReturn<G> = {
-  [K in keyof G]: G[K] extends (...args: any[]) => any
-    ? ReturnType<G[K]>
-    : never;
+  [K in keyof G]: G[K] extends (...args: any[]) => infer R ? R : never;
 };
 
+// Enhanced State type to ensure all keys are present
 type State<T> = {
-  [K in keyof T]: T[K];
+  [K in keyof T]-?: T[K];
 };
 
+// Enhanced StoreDefinition type to ensure state, getters, and actions are defined
 type StoreDefinition<
   T extends object,
   G extends Getters<T>,
@@ -25,6 +26,7 @@ type StoreDefinition<
 };
 
 // Combined store type that includes state, getters, and actions
+// Ensuring all properties are present and correctly typed
 type Store<
   T extends object,
   G extends Getters<T>,
