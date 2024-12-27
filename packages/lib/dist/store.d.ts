@@ -14,6 +14,8 @@ type StoreDefinition<T extends object, G extends Getters<T>, A extends Actions> 
 type Store<T extends object, G extends Getters<T>, A extends Actions> = State<T> & GettersReturn<G> & {
     $state: T;
     actions: A;
+    $underive(keys: (keyof GettersReturn<G>)[]): void;
+    $invalidate(keys: (keyof GettersReturn<G>)[]): void;
 };
 export declare function defineStore<T extends object, G extends Getters<T> = {}, A extends Actions = {}>(definition: StoreDefinition<T, G, A>): Store<T, G, A>;
 export {};

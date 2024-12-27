@@ -3,55 +3,64 @@ import { reactive, computed } from "@vue/reactivity";
 type Getters<T> = Record<string, (store: T & GettersReturn<Getters<T>>) => any>;
 type Actions = Record<string, (...args: any[]) => any>;
 
-// Helper types to infer return types of getters and actions
-// Enhanced typing for better type inference
 type GettersReturn<G> = {
   [K in keyof G]: G[K] extends (...args: any[]) => infer R ? R : never;
 };
 
-// Enhanced State type to ensure all keys are present
 type State<T> = {
   [K in keyof T]-?: T[K];
 };
 
-// Enhanced StoreDefinition type to ensure state, getters, and actions are defined
-type StoreDefinition<
-  T extends object,
-  G extends Getters<T>,
-  A extends Actions
-> = {
+type StoreDefinition<T extends object, G extends Getters<T>, A extends Actions> = {
   state(): T;
   getters?: G;
   actions?: A;
 };
 
-// Combined store type that includes state, getters, and actions
-// Ensuring all properties are present and correctly typed
-type Store<
-  T extends object,
-  G extends Getters<T>,
-  A extends Actions
-> = State<T> &
+type Store<T extends object, G extends Getters<T>, A extends Actions> = State<T> &
   GettersReturn<G> & {
     $state: T;
     actions: A;
+    $underive(keys: (keyof GettersReturn<G>)[]): void;
+    $invalidate(keys: (keyof GettersReturn<G>)[]): void;
   };
 
-export function defineStore<
-  T extends object,
-  G extends Getters<T> = {},
-  A extends Actions = {}
->(definition: StoreDefinition<T, G, A>): Store<T, G, A> {
-  // Create reactive state
+export function defineStore<T extends object, G extends Getters<T> = {}, A extends Actions = {}>(definition: StoreDefinition<T, G, A>): Store<T, G, A> {
   const initialState = definition.state();
   const state = reactive(initialState) as T;
 
-  // Create store object that will hold state, computed properties, and actions
   const store = {
     $state: state,
+    $underive: (keys: (keyof GettersReturn<G>)[]) => {
+      keys.forEach((key) => {
+        const descriptor = Object.getOwnPropertyDescriptor(store, key);
+        if (descriptor && typeof descriptor.get === 'function') {
+          const currentValue = descriptor.get.call(store);
+          Object.defineProperty(store, key, {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: currentValue,
+          });
+        }
+      });
+    },
+    $invalidate: (keys: (keyof GettersReturn<G>)[]) => {
+      keys.forEach((key) => {
+        store.$underive([key]);
+        if (definition.getters && key in definition.getters) {
+          const getter = definition.getters[key];
+          const computedRef = computed(() => getter(store));
+          Object.defineProperty(store, key, {
+            get: () => computedRef.value,
+            enumerable: true,
+            configurable: true,
+          });
+        }
+      });
+    },
   } as Store<T, G, A>;
 
-  // Add direct access to state properties
   Object.keys(state).forEach((key) => {
     Object.defineProperty(store, key, {
       get: () => state[key as keyof T],
@@ -59,21 +68,21 @@ export function defineStore<
         state[key as keyof T] = value;
       },
       enumerable: true,
+      configurable: true,
     });
   });
 
-  // Add computed properties
   if (definition.getters) {
     Object.entries(definition.getters).forEach(([key, fn]) => {
       const computedRef = computed(() => fn(store));
       Object.defineProperty(store, key, {
         get: () => computedRef.value,
         enumerable: true,
+        configurable: true,
       });
     });
   }
 
-  // Add actions
   if (definition.actions) {
     const boundActions = {} as A;
 
