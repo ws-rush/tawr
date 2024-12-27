@@ -1,10 +1,10 @@
 type Getters<T> = Record<string, (store: T & GettersReturn<Getters<T>>) => any>;
 type Actions = Record<string, (...args: any[]) => any>;
 type GettersReturn<G> = {
-    [K in keyof G]: G[K] extends (...args: any[]) => any ? ReturnType<G[K]> : never;
+    [K in keyof G]: G[K] extends (...args: any[]) => infer R ? R : never;
 };
 type State<T> = {
-    [K in keyof T]: T[K];
+    [K in keyof T]-?: T[K];
 };
 type StoreDefinition<T extends object, G extends Getters<T>, A extends Actions> = {
     state(): T;

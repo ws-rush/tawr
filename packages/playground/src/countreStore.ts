@@ -1,4 +1,4 @@
-import { defineStore } from "../lib"
+import { defineStore } from "tawr-state"
 
 export const counterStore = defineStore({
   getters: {

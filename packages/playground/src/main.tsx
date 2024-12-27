@@ -2,7 +2,7 @@
 import React, { Suspense, use } from "react";
 import { createRoot } from "react-dom/client";
 
-import { useSnapshot } from "../lib";
+import { useSnapshot } from "tawr-state";
 import { asyncInc, counterStore, dec, inc, incBy } from "./countreStore";
 import { postsStore } from "./postsStore";
 

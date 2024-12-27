@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), dts({ insertTypesEntry: true })],
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'lib/index.tsx'),
+      entry: path.resolve(__dirname, 'src/index.tsx'),
       name: 'TawrState',
       fileName: 'tawr-state'
     },

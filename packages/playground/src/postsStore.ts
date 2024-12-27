@@ -1,4 +1,4 @@
-import { defineStore } from "../lib";
+import { defineStore } from "tawr-state";
 
 // let cache = new Map();
 // const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes in milliseconds
