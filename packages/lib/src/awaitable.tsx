@@ -1,7 +1,6 @@
 import {
   ReactNode,
   Suspense,
-  // @ts-expect-error handle later when react 19 released
   use,
   Component,
   ErrorInfo,
