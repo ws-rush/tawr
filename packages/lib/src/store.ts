@@ -1,23 +1,23 @@
 import { reactive, computed } from "@vue/reactivity";
 
-type Getters<T> = Record<string, (store: T & GettersReturn<Getters<T>>) => any>;
-type Actions = Record<string, (...args: any[]) => any>;
+export type Getters<T> = Record<string, (store: T & GettersReturn<Getters<T>>) => any>;
+export type Actions = Record<string, (...args: any[]) => any>;
 
-type GettersReturn<G> = {
+export type GettersReturn<G> = {
   [K in keyof G]: G[K] extends (...args: any[]) => infer R ? R : never;
 };
 
-type State<T> = {
+export type State<T> = {
   [K in keyof T]-?: T[K];
 };
 
-type StoreDefinition<T extends object, G extends Getters<T>, A extends Actions> = {
+export type StoreDefinition<T extends object, G extends Getters<T>, A extends Actions> = {
   state(): T;
   getters?: G;
   actions?: A;
 };
 
-type Store<T extends object, G extends Getters<T>, A extends Actions> = State<T> &
+export type Store<T extends object, G extends Getters<T>, A extends Actions> = State<T> &
   GettersReturn<G> & {
     $state: T;
     actions: A;
@@ -45,7 +45,7 @@ export function defineStore<T extends object, G extends Getters<T> = {}, A exten
         }
       });
     },
-    $invalidate: (keys: (keyof GettersReturn<G>)[]) => {
+    $invalidate: (keys: (keyof GettersReturn<G>)[]): void => {
       keys.forEach((key) => {
         store.$underive([key]);
         if (definition.getters && key in definition.getters) {
