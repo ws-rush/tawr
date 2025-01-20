@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useRef, useSyncExternalStore } from "react";
+import { Store as BaseStore, Getters, GettersReturn, Actions, State } from "./store";
 import { watch } from "@vue/reactivity";
-import { Store as BaseStore, Getters, GettersReturn, Actions, State } from "./store"; // Import necessary types
 
 // Types
 export type PathKey = string | number;
@@ -69,49 +69,62 @@ export function useSnapshot<T extends object, G extends Getters<T>, A extends Ac
     throw new Error("useSnapshot requires a store created with defineStore()");
   }
 
-  const [, forceUpdate] = useState(0);
   const accessedPaths = useRef(new Set<string>());
-  const mountedRef = useRef(true);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
+  const snapshotCache = useRef<StoreSnapshot<T, G> | null>(null);
+  const snapshotVersion = useRef(0);
 
   const trackAccess = (path: Path) => {
     accessedPaths.current.add(path.join("."));
   };
 
-  useEffect(() => {
+  const subscribe = (onStoreChange: () => void) => {
     const paths = Array.from(accessedPaths.current);
-    const cleanups: (() => void)[] = [];
-
-    paths.forEach((pathKey) => {
+    
+    // Create Vue watchers for each accessed path
+    const stopWatchers = paths.map(pathKey => {
       const path = pathKey.split(".");
-      const stopWatch = watch(
+      
+      return watch(
         () => {
           let value: any = store;
           for (const key of path) {
+            if (value === undefined || value === null) return undefined;
             value = value[key as PathKey];
+            if (isLikelyComputedRef(value)) {
+              value = value.value;
+            }
           }
           return value;
         },
         () => {
-          if (mountedRef.current) {
-            forceUpdate((n) => n + 1);
-          }
+          // Increment version to invalidate cache
+          snapshotVersion.current++;
+          snapshotCache.current = null;
+          onStoreChange();
         },
-        // @ts-expect-error
-        { flush: "sync" }
+        // @ts-expect-error Vue's watch options type doesn't include flush
+        { flush: 'sync' }
       );
-      cleanups.push(stopWatch);
     });
 
-    return () => cleanups.forEach((cleanup) => cleanup());
-  }, [store]);
+    return () => {
+      stopWatchers.forEach(stop => stop());
+    };
+  };
 
-  accessedPaths.current = new Set();
-  return createSnapshot(store, trackAccess);
+  const getSnapshot = () => {
+    // Return cached snapshot if available
+    if (snapshotCache.current !== null) {
+      return snapshotCache.current;
+    }
+
+    // Reset accessed paths before creating new snapshot
+    accessedPaths.current = new Set();
+    
+    // Create and cache new snapshot
+    snapshotCache.current = createSnapshot(store, trackAccess);
+    return snapshotCache.current;
+  };
+
+  return useSyncExternalStore(subscribe, getSnapshot);
 }
