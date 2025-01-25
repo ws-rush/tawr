@@ -1004,7 +1004,7 @@ function Mt(e) {
   }), e.actions) {
     const n = {};
     Object.entries(e.actions).forEach(([i, o]) => {
-      n[i] = o.bind(null);
+      n[i] = o.bind(s);
     }), s.actions = n;
   }
   return s;

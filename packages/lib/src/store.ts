@@ -1,8 +1,5 @@
 import { reactive, computed } from "@vue/reactivity";
 
-export type Getters<T> = Record<string, (store: T & GettersReturn<Getters<T>>) => any>;
-export type Actions = Record<string, (...args: any[]) => any>;
-
 export type GettersReturn<G> = {
   [K in keyof G]: G[K] extends (...args: any[]) => infer R ? R : never;
 };
@@ -11,21 +8,42 @@ export type State<T> = {
   [K in keyof T]-?: T[K];
 };
 
-export type StoreDefinition<T extends object, G extends Getters<T>, A extends Actions> = {
+export type StoreInstance<T, G = {}> = T & GettersReturn<G> & {
+  $state: T;
+};
+
+export type Getters<T, G = {}> = {
+  [K: string]: (store: StoreInstance<T, G>) => any;
+};
+
+export type Actions<T, G = {}> = {
+  [K: string]: (this: StoreInstance<T, G>, ...args: any[]) => any;
+};
+
+export type StoreDefinition<
+  T extends object,
+  G extends Getters<T, G> = {},
+  A extends Actions<T, G> = {}
+> = {
   state(): T;
   getters?: G;
   actions?: A;
 };
 
-export type Store<T extends object, G extends Getters<T>, A extends Actions> = State<T> &
-  GettersReturn<G> & {
-    $state: T;
-    actions: A;
-    $underive(keys: (keyof GettersReturn<G>)[]): void;
-    $invalidate(keys: (keyof GettersReturn<G>)[]): void;
-  };
-
-export function defineStore<T extends object, G extends Getters<T> = {}, A extends Actions = {}>(definition: StoreDefinition<T, G, A>): Store<T, G, A> {
+export type Store<
+  T extends object,
+  G extends Getters<T, G> = {},
+  A extends Actions<T, G> = {}
+> = StoreInstance<T, G> & {
+  actions: A;
+  $underive(keys: (keyof GettersReturn<G>)[]): void;
+  $invalidate(keys: (keyof GettersReturn<G>)[]): void;
+};
+export function defineStore<
+  T extends object,
+  G extends Getters<T, G> = {},
+  A extends Actions<T, G> = {}
+>(definition: StoreDefinition<T, G, A>): Store<T, G, A> {
   const initialState = definition.state();
   const state = reactive(initialState) as T;
 
@@ -84,14 +102,14 @@ export function defineStore<T extends object, G extends Getters<T> = {}, A exten
   }
 
   if (definition.actions) {
-    const boundActions = {} as A;
+  const boundActions = {} as A;
 
-    Object.entries(definition.actions).forEach(([key, fn]) => {
-      boundActions[key as keyof A] = fn.bind(null) as A[keyof A];
-    });
+  Object.entries(definition.actions).forEach(([key, fn]) => {
+    boundActions[key as keyof A] = fn.bind(store) as A[keyof A];
+  });
 
-    store.actions = boundActions;
-  }
+  store.actions = boundActions;
+}
 
   return store;
 }

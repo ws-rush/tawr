@@ -62,7 +62,7 @@ function createSnapshot<T extends object, G extends Getters<T>>(
   return createProxy(store) as StoreSnapshot<T, G>;
 }
 
-export function useSnapshot<T extends object, G extends Getters<T>, A extends Actions>(
+export function useSnapshot<T extends object, G extends Getters<T>, A extends Actions<T, G>>(
   store: BaseStore<T, G, A>
 ): StoreSnapshot<T, G> {
   if (!isStore(store)) {

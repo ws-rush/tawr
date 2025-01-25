@@ -1,16 +1,20 @@
 import { defineStore } from "tawr-state"
 
 export const counterStore = defineStore({
+  state: () => ({
+    count: 0,
+    first_name: 'john',
+    last_name: 'doe'
+  }),
   getters: {
-    doubleCount: () => counterStore.count * 2,
-    full_name: () => `${counterStore.first_name} ${counterStore.last_name}`
+    doubleCount: (store) => store.count * 2,
+    full_name: (store) => `${store.first_name} ${store.last_name}`
   },
   actions: {
     inc() {
-      counterStore.count++
+      this.count++
     },
     async asyncInc() {
-      // rewrite this line to success and fail randomly
       await new Promise((resolve, reject) => {
         setTimeout(() => {
           if (Math.random() > 0.5) {
@@ -20,29 +24,22 @@ export const counterStore = defineStore({
           }
         }, 1000)
       })
-      counterStore.count++
+      this.count++
     },
     dec() {
-      counterStore.count--
+      this.count--
     },
     incBy(num: number) {
-      counterStore.count += num
+      this.count += num
     },
     decBy(num: number) {
-      counterStore.count += num
+      this.count -= num // Fixed the bug: was += instead of -=
     },
     rename(first_name: string, last_name: string) {
-      counterStore.first_name = first_name
-      counterStore.last_name = last_name
+      this.first_name = first_name
+      this.last_name = last_name
     }
-  },
-  state() {
-    return {
-      count: 0,
-      first_name: 'john',
-      last_name: 'doe'
-    }
-  },
+  }
 })
 
 export const { inc, asyncInc, dec, incBy, decBy, rename } = counterStore.actions

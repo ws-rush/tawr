@@ -10,8 +10,8 @@ export const postsStore = defineStore({
     };
   },
   getters: {
-    posts: () => {
-      const userId = postsStore.userId;
+    posts: (store) => {
+      const userId = store.userId;
       return fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId ? userId : 1}`)
       .then((response) => response.json())
     },
@@ -44,7 +44,7 @@ export const postsStore = defineStore({
   },
   actions: {
     setUserId(userId: number) {
-      postsStore.userId = userId;
+      this.userId = userId;
     },
   },
 });
