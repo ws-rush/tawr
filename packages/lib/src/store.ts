@@ -8,22 +8,24 @@ export type State<T> = {
   [K in keyof T]-?: T[K];
 };
 
-export type StoreInstance<T, G = {}> = T & GettersReturn<G> & {
+export type StoreState<T> = {
+  [K in keyof T]: T[K];
+} & {
   $state: T;
 };
 
-export type Getters<T, G = {}> = {
-  [K: string]: (store: StoreInstance<T, G>) => any;
+export type Getters<T> = {
+  [K: string]: (store: StoreState<T>) => any;
 };
 
-export type Actions<T, G = {}> = {
-  [K: string]: (this: StoreInstance<T, G>, ...args: any[]) => any;
+export type Actions<T, G> = {
+  [K: string]: (this: StoreState<T> & GettersReturn<G>, ...args: any[]) => any;
 };
 
 export type StoreDefinition<
   T extends object,
-  G extends Getters<T, G> = {},
-  A extends Actions<T, G> = {}
+  G extends Getters<T> = Getters<T>,
+  A extends Actions<T, G> = Actions<T, G>
 > = {
   state(): T;
   getters?: G;
@@ -32,17 +34,18 @@ export type StoreDefinition<
 
 export type Store<
   T extends object,
-  G extends Getters<T, G> = {},
-  A extends Actions<T, G> = {}
-> = StoreInstance<T, G> & {
+  G extends Getters<T> = Getters<T>,
+  A extends Actions<T, G> = Actions<T, G>
+> = StoreState<T> & GettersReturn<G> & {
   actions: A;
   $underive(keys: (keyof GettersReturn<G>)[]): void;
   $invalidate(keys: (keyof GettersReturn<G>)[]): void;
 };
+
 export function defineStore<
   T extends object,
-  G extends Getters<T, G> = {},
-  A extends Actions<T, G> = {}
+  G extends Getters<T> = Getters<T>,
+  A extends Actions<T, G> = Actions<T, G>
 >(definition: StoreDefinition<T, G, A>): Store<T, G, A> {
   const initialState = definition.state();
   const state = reactive(initialState) as T;
@@ -68,7 +71,7 @@ export function defineStore<
         store.$underive([key]);
         if (definition.getters && key in definition.getters) {
           const getter = definition.getters[key];
-          const computedRef = computed(() => getter(store));
+          const computedRef = computed(() => getter(store as StoreState<T>));
           Object.defineProperty(store, key, {
             get: () => computedRef.value,
             enumerable: true,
@@ -92,7 +95,7 @@ export function defineStore<
 
   if (definition.getters) {
     Object.entries(definition.getters).forEach(([key, fn]) => {
-      const computedRef = computed(() => fn(store));
+      const computedRef = computed(() => fn(store as StoreState<T>));
       Object.defineProperty(store, key, {
         get: () => computedRef.value,
         enumerable: true,
@@ -102,14 +105,14 @@ export function defineStore<
   }
 
   if (definition.actions) {
-  const boundActions = {} as A;
+    const boundActions = {} as A;
 
-  Object.entries(definition.actions).forEach(([key, fn]) => {
-    boundActions[key as keyof A] = fn.bind(store) as A[keyof A];
-  });
+    Object.entries(definition.actions).forEach(([key, fn]) => {
+      boundActions[key as keyof A] = fn.bind(store) as A[keyof A];
+    });
 
-  store.actions = boundActions;
-}
+    store.actions = boundActions;
+  }
 
   return store;
 }

@@ -1,11 +1,6 @@
 import { defineStore } from "tawr-state"
 
 export const counterStore = defineStore({
-  state: () => ({
-    count: 0,
-    first_name: 'john',
-    last_name: 'doe'
-  }),
   getters: {
     doubleCount: (store) => store.count * 2,
     full_name: (store) => `${store.first_name} ${store.last_name}`
@@ -39,7 +34,12 @@ export const counterStore = defineStore({
       this.first_name = first_name
       this.last_name = last_name
     }
-  }
+  },
+  state: () => ({
+    count: 0,
+    first_name: 'john',
+    last_name: 'doe'
+  }),
 })
 
 export const { inc, asyncInc, dec, incBy, decBy, rename } = counterStore.actions
