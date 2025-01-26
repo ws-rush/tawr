@@ -44,8 +44,9 @@ function Count() {
   counter.full_name
 
   return <>
-  <p>{counter.count}</p>
-  <p>{counter.doubleCount}</p>
+  <p>count: {counter.count}</p>
+  <p>double count: {counter.doubleCount}</p>
+  <p>quadro count: {counter.quadroCount}</p>
   </>;
 }
 

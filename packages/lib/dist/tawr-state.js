@@ -958,7 +958,7 @@ function Pt(e) {
 function Mt(e) {
   const t = e.state(), r = we(t), s = {
     $state: r,
-    $underive: (n) => {
+    $underive(n) {
       n.forEach((i) => {
         const o = Object.getOwnPropertyDescriptor(s, i);
         if (o && typeof o.get == "function") {
@@ -972,7 +972,7 @@ function Mt(e) {
         }
       });
     },
-    $invalidate: (n) => {
+    $invalidate(n) {
       n.forEach((i) => {
         if (s.$underive([i]), e.getters && i in e.getters) {
           const o = e.getters[i], c = me(() => o(s));
