@@ -41,8 +41,6 @@ function Name() {
 function Count() {
   const counter = useSnapshot(counterStore);
 
-  counter.full_name
-
   return <>
   <p>count: {counter.count}</p>
   <p>double count: {counter.doubleCount}</p>
