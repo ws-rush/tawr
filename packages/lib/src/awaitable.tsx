@@ -46,7 +46,7 @@ function AwaitableContent<T>({
   resolve,
   children,
 }: Omit<AwaitableProps<T>, "fallback" | "error">) {
-  const value = use(resolve);
+  const value = resolve instanceof Promise ? use(resolve) : resolve
   return <>{children(value)}</>;
 }
 
@@ -64,11 +64,19 @@ export function Awaitable<T>({
   error = (err) => <div>Error: {err.message}</div>,
   children,
 }: AwaitableProps<T>) {
-  return (
-    <ErrorBoundary fallback={error}>
+  if (fallback) {
+    return (
+      <ErrorBoundary fallback={error}>
       <Suspense fallback={fallback}>
         <AwaitableContent resolve={resolve} children={children} />
       </Suspense>
+    </ErrorBoundary>
+    )
+  }
+
+  return (
+    <ErrorBoundary fallback={error}>
+        <AwaitableContent resolve={resolve} children={children} />
     </ErrorBoundary>
   );
 }

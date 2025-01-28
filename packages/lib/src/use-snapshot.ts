@@ -7,6 +7,7 @@ export type PathKey = string | number;
 export type Path = PathKey[];
 
 export type StoreSnapshot<T extends object, G extends Getters<T>> = State<T> & GettersReturn<G>;
+export type UseStoreSnapshot<T extends object, G extends Getters<T>> = () => StoreSnapshot<T, G>;
 
 // Type guard
 function isStore(obj: any): obj is BaseStore<any, any, any> {

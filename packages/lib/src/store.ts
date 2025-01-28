@@ -1,4 +1,5 @@
 import { reactive, computed } from "@vue/reactivity";
+import { useSnapshot, UseStoreSnapshot } from "./use-snapshot";
 
 // 1) The store shape that each action will see as `this`.
 type StoreContext<T, G> = T &
@@ -63,7 +64,7 @@ export function defineStore<
   T extends object,
   G extends Getters<T> = Getters<T>,
   A extends Actions<T, G> = Actions<T, G>
->(definition: StoreDefinition<T, G, A>): Store<T, G, A> {
+>(definition: StoreDefinition<T, G, A>): [UseStoreSnapshot<T,G>, Store<T, G, A>] {
   const initialState = definition.state();
   const state = reactive(initialState) as T;
   
@@ -184,5 +185,5 @@ export function defineStore<
     (store as any).actions = boundActions;
   }
 
-  return store;
+  return [() => useSnapshot(store), store];
 }

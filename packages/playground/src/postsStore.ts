@@ -1,11 +1,11 @@
 import { defineStore } from "tawr-state";
 
-export const postsStore = defineStore({
+export const [usePostsStore,postsStore] = defineStore({
   state: () => ({
     userId: 0,
   }),
   getters: {
-    posts: (store) => {
+    posts: (store): Promise<{id: number, title: string}[]> => {
       const userId = store.userId;
       return fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId ? userId : 1}`)
         .then((response) => response.json());
@@ -17,3 +17,5 @@ export const postsStore = defineStore({
     },
   },
 });
+
+export const { setUserId } = postsStore.actions

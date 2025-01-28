@@ -1,3 +1,4 @@
+import { UseStoreSnapshot } from './use-snapshot';
 type StoreContext<T, G> = T & {
     $state: T;
 } & GettersReturn<G> & {
@@ -35,5 +36,5 @@ export type StoreDefinition<T extends object, G extends Getters<T> = Getters<T>,
     getters?: G;
     actions?: A;
 };
-export declare function defineStore<T extends object, G extends Getters<T> = Getters<T>, A extends Actions<T, G> = Actions<T, G>>(definition: StoreDefinition<T, G, A>): Store<T, G, A>;
+export declare function defineStore<T extends object, G extends Getters<T> = Getters<T>, A extends Actions<T, G> = Actions<T, G>>(definition: StoreDefinition<T, G, A>): [UseStoreSnapshot<T, G>, Store<T, G, A>];
 export {};

@@ -2,4 +2,5 @@ import { Store as BaseStore, Getters, GettersReturn, Actions, State } from './st
 export type PathKey = string | number;
 export type Path = PathKey[];
 export type StoreSnapshot<T extends object, G extends Getters<T>> = State<T> & GettersReturn<G>;
+export type UseStoreSnapshot<T extends object, G extends Getters<T>> = () => StoreSnapshot<T, G>;
 export declare function useSnapshot<T extends object, G extends Getters<T>, A extends Actions<T, G>>(store: BaseStore<T, G, A>): StoreSnapshot<T, G>;

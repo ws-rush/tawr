@@ -1,9 +1,9 @@
-import React, { Suspense, use } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 
-import { useSnapshot } from "tawr-state";
-import { asyncInc, counterStore, dec, inc, incBy } from "./countreStore";
-import { postsStore } from "./postsStore";
+import { asyncInc, counterStore, dec, inc, incBy, rename, useCounterStore } from "./countreStore";
+import { setUserId, usePostsStore } from "./postsStore";
+import { Awaitable } from "tawr-state";
 
 function Actions() {
   return (
@@ -22,7 +22,7 @@ function Actions() {
       </button>
       <button
         type="button"
-        onClick={() => counterStore.actions.rename("rush", "wusaby")}
+        onClick={() => rename("rush", "wusaby")}
       >
         chnage name
       </button>
@@ -33,13 +33,13 @@ function Actions() {
 }
 
 function Name() {
-  const counter = useSnapshot(counterStore);
+  const counter = useCounterStore()
 
   return <h2>{counter.full_name}</h2>;
 }
 
 function Count() {
-  const counter = useSnapshot(counterStore);
+  const counter = useCounterStore()
 
   return <>
   <p>count: {counter.count}</p>
@@ -49,28 +49,31 @@ function Count() {
 }
 
 function Posts() {
-  const snap = useSnapshot(postsStore);
+  const snap = usePostsStore();
 
   // check if it promise or not
-  const posts = snap.posts instanceof Promise ?  use(snap.posts) : snap.posts;
+  // const posts = snap.posts instanceof Promise ?  use(snap.posts) : snap.posts;
 
   return (
     <ul>
-      {
+      {/* {
         // check if it promise or not
         posts.map((post: any) => <li key={post.id}>{post.title}</li>)
-      }
-      {/* <Awaitable resolve={snap.posts} fallback={<p>loading ...</p>} error={(e) => <p>{e.message}</p>} children={(posts) => posts.map((post) => <li key={post.id}>{post.title}</li>)} /> */}
+      } */}
+      <Awaitable resolve={snap.posts}
+        // fallback={<p>loading ...</p>}
+        error={(e) => <p>{e.message}</p>} 
+        children={(posts) => posts.map((post) => <li key={post.id}>{post.title}</li>)} />
     </ul>
   );
 }
 
 createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
-    <input type="number" onChange={(e) => postsStore.actions.setUserId(Number(e.target.value))} defaultValue={1} />
-    <Suspense fallback={<p>loading ...</p>}>
+    <input type="number" onChange={(e) => setUserId(Number(e.target.value))} defaultValue={1} />
+    {/* <Suspense fallback={<p>loading ...</p>}> */}
       <Posts />
-    </Suspense>
+    {/* </Suspense> */}
     <Name />
     <Count />
     <Actions />

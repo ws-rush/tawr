@@ -19,11 +19,18 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "publish": "pnpm publish --access public"
+    "publish": "pnpm publish --access public",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
     "@types/node": "^22.9.0",
-    "vite-plugin-dts": "^4.2.4"
+    "@vitest/ui": "^3.0.4",
+    "jsdom": "^26.0.0",
+    "vite-plugin-dts": "^4.2.4",
+    "vitest": "^3.0.4"
   },
   "dependencies": {
     "@vue/reactivity": "^3.5.13"
