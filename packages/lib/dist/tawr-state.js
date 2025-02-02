@@ -901,7 +901,7 @@ function O(e, t = 1 / 0, r) {
   return e;
 }
 function Vt(e) {
-  return e && typeof e == "object" && "$state" in e && "actions" in e;
+  return e && typeof e == "object" && "$state" in e;
 }
 function Ye(e) {
   return typeof e == "object" && e !== null && typeof e.value < "u";

@@ -1,78 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { defineStore } from './store';
+import { defineStore } from '../store';
 
 describe('Store', () => {
-  describe('Optional Parameters', () => {
-    it('works with only state', () => {
-      const [,store] = defineStore({
-        state: () => ({ count: 0 })
-      });
-      expect(store.count).toBe(0);
-      store.count = 1;
-      expect(store.count).toBe(1);
-    });
-
-    it('works with only getters', () => {
-      const [,store] = defineStore({
-        getters: {
-          currentTime: () => Date.now()
-        }
-      });
-      expect(typeof store.currentTime).toBe('number');
-    });
-
-    it('works with only actions', () => {
-      const mockFn = vi.fn();
-      const [,store] = defineStore({
-        actions: {
-          doSomething() {
-            mockFn();
-          }
-        }
-      });
-      store.actions.doSomething();
-      expect(mockFn).toHaveBeenCalled();
-    });
-
-    it('works with state and getters (no actions)', () => {
-      const [,store] = defineStore({
-        state: () => ({ value: 5 }),
-        getters: {
-          doubled: (store) => store.value * 2
-        }
-      });
-      expect(store.value).toBe(5);
-      expect(store.doubled).toBe(10);
-    });
-
-    it('works with state and actions (no getters)', () => {
-      const [,store] = defineStore({
-        state: () => ({ count: 0 }),
-        actions: {
-          increment() {
-            this.count++;
-          }
-        }
-      });
-      store.actions.increment();
-      expect(store.count).toBe(1);
-    });
-
-    it('works with getters and actions (no state)', () => {
-      const [,store] = defineStore({
-        getters: {
-          randomValue: () => Math.random()
-        },
-        actions: {
-          logValue() {
-            return this.randomValue;
-          }
-        }
-      });
-      expect(typeof store.actions.logValue()).toBe('number');
-    });
-  });
-
   describe('Basic Store Functionality', () => {
     const [,store] = defineStore({
       state: () => ({

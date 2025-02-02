@@ -1,4 +1,4 @@
-import { defineStore } from './store';
+import { defineStore } from '../store';
 
 // This should show type errors if inference is incorrect
 const [, store] = defineStore({
