@@ -266,16 +266,6 @@ describe('Store in Components', () => {
       })
     });
 
-    const CountDisplay = () => {
-      const selective = useSelectiveStore();
-      return <div data-testid="count">Count: {selective.count}</div>;
-    };
-
-    const NameDisplay = () => {
-      const snapshot = useSelectiveStore();
-      return <div data-testid="name">Name: {snapshot.name}</div>;
-    };
-
     it('only re-renders components that access changed state', async () => {
       const CountWrapper = () => {
         const snapshot = useSelectiveStore();
