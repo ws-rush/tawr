@@ -14,13 +14,15 @@ export type GettersReturn<G> = {
 export type State<T> = {
     [K in keyof T]-?: T[K];
 };
-export type StoreState<T> = {
-    [K in keyof T]: T[K];
-} & {
+export type StoreState<T> = T & {
     $state: T;
 };
 export type Getters<T> = {
-    [K: string]: (store: StoreState<T>) => any;
+    [K: string]: (store: T & {
+        $state: T;
+    } & {
+        [K in keyof Getters<T>]: ReturnType<Getters<T>[K]>;
+    }) => any;
 };
 export type Store<T extends object, G extends Getters<T>, A extends Actions<T, G>> = T & {
     $state: T;

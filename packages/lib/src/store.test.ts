@@ -57,7 +57,6 @@ describe('Store', () => {
         state: () => ({ count: 1 }),
         getters: {
           double: (store) => store.count * 2,
-          // @ts-expect-error inference dependent getters
           quadruple: (store) => store.double * 2
         }
       });

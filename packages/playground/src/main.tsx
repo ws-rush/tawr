@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 
 import { asyncInc, counterStore, dec, inc, incBy, rename, useCounterStore } from "./countreStore";
-import { setUserId, usePostsStore } from "./postsStore";
+import { setUserId } from "./postsStore";
 import { Awaitable } from "tawr-state";
 
 function Actions() {
@@ -48,31 +48,54 @@ function Count() {
   </>;
 }
 
-function Posts() {
-  const snap = usePostsStore();
+const data = {
+  resolve: new Promise((resolveit) => setTimeout(() => {
+    resolveit([{ id: 1, title: 'test' }, { id: 2, title: 'test2' }])
+  }, 2000))
+};
 
-  // check if it promise or not
-  // const posts = snap.posts instanceof Promise ?  use(snap.posts) : snap.posts;
+function Posts({ resolve }: any) {
+
+
+  const myresolve = resolve
 
   return (
     <ul>
-      {/* {
-        // check if it promise or not
-        posts.map((post: any) => <li key={post.id}>{post.title}</li>)
-      } */}
-      <Awaitable resolve={snap.posts}
-        // fallback={<p>loading ...</p>}
-        error={(e) => <p>{e.message}</p>} 
-        children={(posts) => posts.map((post) => <li key={post.id}>{post.title}</li>)} />
+      <Awaitable resolve={myresolve}
+         // fallback={<p>loading ...</p>}
+         error={(e) => <p>{e.message}</p>} 
+         children={(posts) => (posts as any).map((post: any) => <li key={post.id}>{post.title}</li>)} />
     </ul>
   );
 }
+
+// function Posts() {
+//   const snap = usePostsStore();
+
+//   const resolve = new Promise((resolveit) => setTimeout(() => resolveit([{ id: 1, title: 'test' }, { id: 2, title: 'test2' }]), 1000));
+
+//   // check if it promise or not
+//   const posts = resolve instanceof Promise ?  use(resolve) : resolve;
+
+//   return (
+//     <ul>
+//       {
+//         // check if it promise or not
+//         posts.map((post: any) => <li key={post.id}>{post.title}</li>)
+//       }
+//       {/* <Awaitable resolve={snap.posts}
+//         // fallback={<p>loading ...</p>}
+//         error={(e) => <p>{e.message}</p>} 
+//         children={(posts) => posts.map((post) => <li key={post.id}>{post.title}</li>)} /> */}
+//     </ul>
+//   );
+// }
 
 createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
     <input type="number" onChange={(e) => setUserId(Number(e.target.value))} defaultValue={1} />
     {/* <Suspense fallback={<p>loading ...</p>}> */}
-      <Posts />
+      <Posts resolve={data.resolve} />
     {/* </Suspense> */}
     <Name />
     <Count />

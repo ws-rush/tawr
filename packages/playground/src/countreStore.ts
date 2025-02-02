@@ -3,7 +3,6 @@ import { defineStore } from "tawr-state"
 export const [useCounterStore, counterStore] = defineStore({
   getters: {
     doubleCount: (store) => store.count * 2,
-    // @ts-expect-error fix getters dpendent getters typing later
     quadroCount: (store) => store.doubleCount * 2,
     full_name: (store) => `${store.first_name} ${store.last_name}`
   },

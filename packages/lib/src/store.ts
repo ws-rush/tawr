@@ -2,9 +2,7 @@ import { reactive, computed } from "@vue/reactivity";
 import { useSnapshot, UseStoreSnapshot } from "./use-snapshot";
 
 // 1) The store shape that each action will see as `this`.
-type StoreContext<T, G> = T &
-  { $state: T } &
-  GettersReturn<G> & {
+type StoreContext<T, G> = T & { $state: T } & GettersReturn<G> & {
     $underive(keys: (keyof GettersReturn<G>)[]): void;
     $invalidate(keys: (keyof GettersReturn<G>)[]): void;
   };
@@ -23,23 +21,19 @@ export type State<T> = {
   [K in keyof T]-?: T[K];
 };
 
-export type StoreState<T> = {
-  [K in keyof T]: T[K];
-} & { $state: T };
+export type StoreState<T> = T & { $state: T };
 
 export type Getters<T> = {
-  [K: string]: (store: StoreState<T>) => any;
+  [K: string]: (store: T & { $state: T } & { [K in keyof Getters<T>]: ReturnType<Getters<T>[K]> }) => any;
 };
 
-// 3) For the final store, from “external usage,” actions 
+// 3) For the final store, from “external usage,” actions
 //    become methods that do not expose a `this` parameter.
 export type Store<
   T extends object,
   G extends Getters<T>,
   A extends Actions<T, G>
-> = T &
-  { $state: T } &
-  GettersReturn<G> & {
+> = T & { $state: T } & GettersReturn<G> & {
     actions: {
       [K in keyof A]: A[K] extends (this: any, ...args: infer P) => infer R
         ? (...args: P) => R
@@ -64,30 +58,18 @@ export function defineStore<
   T extends object,
   G extends Getters<T> = Getters<T>,
   A extends Actions<T, G> = Actions<T, G>
->(definition: StoreDefinition<T, G, A>): [UseStoreSnapshot<T,G>, Store<T, G, A>] {
+>(
+  definition: StoreDefinition<T, G, A>
+): [UseStoreSnapshot<T, G>, Store<T, G, A>] {
   const initialState = definition.state();
   const state = reactive(initialState) as T;
-  
-  // Track dependencies between getters
-  const dependencyMap = new Map<keyof GettersReturn<G>, Set<keyof GettersReturn<G>>>();
-  let currentComputation: keyof GettersReturn<G> | null = null;
-  
-  // Helper to track getter dependencies
-  const trackDependency = (dependency: keyof GettersReturn<G>) => {
-    if (currentComputation) {
-      if (!dependencyMap.has(dependency)) {
-        dependencyMap.set(dependency, new Set());
-      }
-      dependencyMap.get(dependency)!.add(currentComputation);
-    }
-  };
 
   const store = {
     $state: state,
     $underive(keys: (keyof GettersReturn<G>)[]) {
       keys.forEach((key) => {
         const descriptor = Object.getOwnPropertyDescriptor(store, key);
-        if (descriptor && typeof descriptor.get === 'function') {
+        if (descriptor && typeof descriptor.get === "function") {
           const currentValue = descriptor.get.call(store);
           Object.defineProperty(store, key, {
             configurable: true,
@@ -98,48 +80,21 @@ export function defineStore<
         }
       });
     },
-    $invalidate(keys: (keyof GettersReturn<G>)[]): void {
-      // Collect all affected getters (including dependencies)
-      const affectedGetters = new Set<keyof GettersReturn<G>>();
-      
-      const addAffectedGetter = (key: keyof GettersReturn<G>) => {
-        if (!affectedGetters.has(key)) {
-          affectedGetters.add(key);
-          // Add all dependent getters
-          dependencyMap.get(key)?.forEach(dependent => {
-            addAffectedGetter(dependent);
-          });
-        }
-      };
-      
-      // Add initial keys and their dependents
-      keys.forEach(key => addAffectedGetter(key));
-      
-      // Convert to array and sort to ensure deterministic updates
-      const sortedGetters = Array.from(affectedGetters);
-      
-      // Invalidate all affected getters
-      sortedGetters.forEach((key) => {
-        store.$underive([key]);
+    $invalidate(keys: (keyof GettersReturn<G>)[]) {
+      keys.forEach((key) => {
         if (definition.getters && key in definition.getters) {
-          const getter = definition.getters[key];
+          const fn = definition.getters[key];
           const computedRef = computed(() => {
-            currentComputation = key;
-            const result = getter(store as StoreState<T>);
-            currentComputation = null;
-            return result;
+            return fn(store as StoreState<T>);
           });
           Object.defineProperty(store, key, {
-            get: () => {
-              trackDependency(key);
-              return computedRef.value;
-            },
+            get: () => computedRef.value,
             enumerable: true,
             configurable: true,
           });
         }
       });
-    },
+    }
   } as unknown as Store<T, G, A>;
 
   // Attach state properties
@@ -158,14 +113,10 @@ export function defineStore<
   if (definition.getters) {
     Object.entries(definition.getters).forEach(([key, fn]) => {
       const computedRef = computed(() => {
-        currentComputation = key as keyof GettersReturn<G>;
-        const result = fn(store as StoreState<T>);
-        currentComputation = null;
-        return result;
+        return fn(store as StoreState<T>);
       });
       Object.defineProperty(store, key, {
         get: () => {
-          trackDependency(key as keyof GettersReturn<G>);
           return computedRef.value;
         },
         enumerable: true,
