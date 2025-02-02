@@ -39,7 +39,8 @@ export const [useCounterStore, counterStore] = defineStore({
   state: () => ({
     count: 0,
     first_name: 'john',
-    last_name: 'doe'
+    last_name: 'doe',
+    nested: { value: 1 }
   }),
 })
 
