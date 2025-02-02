@@ -34,7 +34,7 @@ export type Store<T extends object, G extends Getters<T>, A extends Actions<T, G
     $invalidate(keys: (keyof GettersReturn<G>)[]): void;
 };
 export type StoreDefinition<T extends object, G extends Getters<T> = Getters<T>, A extends Actions<T, G> = Actions<T, G>> = {
-    state(): T;
+    state?(): T;
     getters?: G;
     actions?: A;
 };

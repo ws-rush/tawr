@@ -11,7 +11,7 @@ export type UseStoreSnapshot<T extends object, G extends Getters<T>> = () => Sto
 
 // Type guard
 function isStore(obj: any): obj is BaseStore<any, any, any> {
-  return obj && typeof obj === "object" && "$state" in obj && "actions" in obj;
+  return obj && typeof obj === "object" && "$state" in obj;
 }
 
 // Function to check if a value is likely a computed ref

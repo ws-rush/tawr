@@ -48,7 +48,7 @@ export type StoreDefinition<
   G extends Getters<T> = Getters<T>,
   A extends Actions<T, G> = Actions<T, G>
 > = {
-  state(): T;
+  state?(): T;
   getters?: G;
   actions?: A;
 };
@@ -61,7 +61,7 @@ export function defineStore<
 >(
   definition: StoreDefinition<T, G, A>
 ): [UseStoreSnapshot<T, G>, Store<T, G, A>] {
-  const initialState = definition.state();
+  const initialState = definition.state?.() ?? {};
   const state = reactive(initialState) as T;
 
   const store = {
