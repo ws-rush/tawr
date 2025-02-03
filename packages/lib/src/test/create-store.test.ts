@@ -29,7 +29,7 @@ describe('Create Store Mechanism', () => {
           }
         }
       });
-      store.actions.doSomething();
+      store.doSomething();
       expect(mockFn).toHaveBeenCalled();
     });
 
@@ -53,7 +53,7 @@ describe('Create Store Mechanism', () => {
           }
         }
       });
-      store.actions.increment();
+      store.increment();
       expect(store.count).toBe(1);
     });
 
@@ -68,7 +68,7 @@ describe('Create Store Mechanism', () => {
           }
         }
       });
-      expect(typeof store.actions.logValue()).toBe('number');
+      expect(typeof store.logValue()).toBe('number');
     });
 
     it('works with all features combined (state + getters + actions)', () => {
@@ -94,12 +94,12 @@ describe('Create Store Mechanism', () => {
       expect(store.quadrupled).toBe(0);
       expect(store.fullName).toBe('john doe');
 
-      store.actions.increment();
+      store.increment();
       expect(store.count).toBe(1);
       expect(store.doubled).toBe(2);
       expect(store.quadrupled).toBe(4);
 
-      store.actions.setName('jane');
+      store.setName('jane');
       expect(store.fullName).toBe('jane doe');
     });
 
@@ -120,7 +120,7 @@ describe('Create Store Mechanism', () => {
         }
       });
 
-      const result = store.actions.increment();
+      const result = store.increment();
       expect(result).toBe(2); // doubled value after increment
       expect(store.count).toBe(1);
     });

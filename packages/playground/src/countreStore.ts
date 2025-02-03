@@ -43,5 +43,3 @@ export const [useCounterStore, counterStore] = defineStore({
     nested: { value: 1 }
   }),
 })
-
-export const { inc, asyncInc, dec, incBy, decBy, rename } = counterStore.actions

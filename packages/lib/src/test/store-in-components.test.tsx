@@ -150,7 +150,7 @@ describe('Store in Components', () => {
     const Controls = () => {
       return (
         <button 
-          onClick={() => store.actions.setValue('updated')}
+          onClick={() => store.setValue('updated')}
           data-testid="update-button"
         >
           Update
@@ -196,13 +196,13 @@ describe('Store in Components', () => {
         <div>
           <span data-testid="count">Count: {counter.count}</span>
           <button 
-            onClick={() => store.actions.increment()}
+            onClick={() => store.increment()}
             data-testid="increment"
           >
             Increment
           </button>
           <button 
-            onClick={() => store.actions.add(5)}
+            onClick={() => store.add(5)}
             data-testid="add-five"
           >
             Add 5
@@ -235,8 +235,8 @@ describe('Store in Components', () => {
         <div>
           <button
             onClick={() => {
-              // immutable.count = 1;
-              // immutable.nested.value = 2;
+              immutable.count = 1;
+              immutable.nested.value = 2;
             }}
             data-testid="mutate"
           >
@@ -247,7 +247,7 @@ describe('Store in Components', () => {
       );
     };
 
-    it.skip('prevents direct mutations of snapshot', () => {
+    it('prevents direct mutations of snapshot', () => {
       render(<ImmutableComponent />);
       
       expect(screen.getByTestId('values')).toHaveTextContent('0,1');
@@ -318,7 +318,7 @@ describe('Store in Components', () => {
     });
   });
 
-  describe.skip('Nested State', () => {
+  describe('Nested State', () => {
     const [useNestedStore, store] = defineStore({
       state: () => ({
         user: {
@@ -386,9 +386,9 @@ describe('Store in Components', () => {
       render(<UserProfile />);
 
       act(() => {
-        store.actions.updateTheme('system');
-        store.actions.incrementVisits();
-        store.actions.incrementVisits();
+        store.updateTheme('system');
+        store.incrementVisits();
+        store.incrementVisits();
       });
 
       expect(screen.getByTestId('theme')).toHaveTextContent('system');
@@ -406,15 +406,15 @@ describe('Store in Components', () => {
         const snapshot = useNestedStore();
 
         useEffect(() => {
-          renderCounts.name++;
+          ++renderCounts.name;
         }, [snapshot.user.profile.name]);
 
         useEffect(() => {
-          renderCounts.theme++;
+          ++renderCounts.theme;
         }, [snapshot.user.profile.settings.theme]);
 
         useEffect(() => {
-          renderCounts.visits++;
+          ++renderCounts.visits;
         }, [snapshot.user.stats.visits]);
 
         return (
@@ -435,8 +435,9 @@ describe('Store in Components', () => {
 
       // Update nested name
       act(() => {
-        store.user.profile.name = 'Jane';
+        store.user.profile.name = 'New Jane';
       });
+
       expect(renderCounts.name).toBe(2);
       expect(renderCounts.theme).toBe(1); // Unchanged
       expect(renderCounts.visits).toBe(1); // Unchanged
@@ -451,7 +452,7 @@ describe('Store in Components', () => {
 
       // Update nested visits through action
       act(() => {
-        store.actions.incrementVisits();
+        store.incrementVisits();
       });
       expect(renderCounts.name).toBe(2); // Unchanged
       expect(renderCounts.theme).toBe(2); // Unchanged

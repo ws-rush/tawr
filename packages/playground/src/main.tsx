@@ -1,28 +1,47 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import { asyncInc, counterStore, dec, inc, incBy, rename, useCounterStore } from "./countreStore";
-import { setUserId } from "./postsStore";
+import { counterStore, useCounterStore } from "./countreStore";
 import { Awaitable } from "tawr-state";
+import { postsStore, usePostsStore } from "./postsStore";
+import { nestedStore, useNestedStore } from "./nestedStore";
+
+const NestedWrapper = () => {
+  const snapshot = useNestedStore();
+
+  return (
+    <div>
+      <div>{snapshot.user.profile.name}</div>
+      <div>{snapshot.user.profile.settings.theme}</div>
+      <div>{snapshot.user.stats.visits}</div>
+
+      <div>
+        <button type="button" onClick={() => nestedStore.user.profile.name = "wusaby"}>chnage name</button>
+        <button type="button" onClick={() => nestedStore.user.profile.settings.theme = "new theme"}>chnage theme</button>
+        <button type="button" onClick={() => nestedStore.user.stats.visits = 5000}>chnage stats</button>
+      </div>
+    </div>
+  );
+};
 
 function Actions() {
   return (
     <div>
-      <button type="button" onClick={() => inc()}>
+      <button type="button" onClick={() => counterStore.inc()}>
         inc
       </button>
-      <button type="button" onClick={() => asyncInc()}>
+      <button type="button" onClick={() => counterStore.asyncInc()}>
         async inc
       </button>
-      <button type="button" onClick={() => dec()}>
+      <button type="button" onClick={() => counterStore.dec()}>
         dec
       </button>
-      <button type="button" onClick={() => incBy(2)}>
+      <button type="button" onClick={() => counterStore.incBy(2)}>
         inc by 2
       </button>
       <button
         type="button"
-        onClick={() => rename("rush", "wusaby")}
+        onClick={() => counterStore.rename("rush", "wusaby")}
       >
         chnage name
       </button>
@@ -48,21 +67,13 @@ function Count() {
   </>;
 }
 
-const data = {
-  resolve: new Promise((resolveit) => setTimeout(() => {
-    resolveit([{ id: 1, title: 'test' }, { id: 2, title: 'test2' }])
-  }, 2000))
-};
-
-function Posts({ resolve }: any) {
-
-
-  const myresolve = resolve
+function Posts() {
+  const posts = usePostsStore()
 
   return (
     <ul>
-      <Awaitable resolve={myresolve}
-         // fallback={<p>loading ...</p>}
+      <Awaitable resolve={posts.posts}
+         fallback={<p>loading ...</p>}
          error={(e) => <p>{e.message}</p>} 
          children={(posts) => (posts as any).map((post: any) => <li key={post.id}>{post.title}</li>)} />
     </ul>
@@ -93,13 +104,14 @@ function Posts({ resolve }: any) {
 
 createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
-    <input type="number" onChange={(e) => setUserId(Number(e.target.value))} defaultValue={1} />
+    <input type="number" onChange={(e) => postsStore.setUserId(Number(e.target.value))} defaultValue={1} />
     {/* <Suspense fallback={<p>loading ...</p>}> */}
-      <Posts resolve={data.resolve} />
+      <Posts />
     {/* </Suspense> */}
     <Name />
     <Count />
     <Actions />
+    <NestedWrapper />
   </React.StrictMode>
 );
 

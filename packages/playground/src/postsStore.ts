@@ -1,6 +1,6 @@
 import { defineStore } from "tawr-state";
 
-export const [usePostsStore,postsStore] = defineStore({
+export const [usePostsStore, postsStore] = defineStore({
   state: () => ({
     userId: 0,
   }),
@@ -17,5 +17,3 @@ export const [usePostsStore,postsStore] = defineStore({
     },
   },
 });
-
-export const { setUserId } = postsStore.actions
