@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 
 import { counterStore, useCounterStore } from "./countreStore";
-import { Awaitable } from "tawr-state";
+import { Awaitable, _observer as observer } from "tawr-state";
 import { postsStore, usePostsStore } from "./postsStore";
 import { nestedStore, useNestedStore } from "./nestedStore";
 
@@ -54,8 +54,13 @@ function Actions() {
 function Name() {
   const counter = useCounterStore()
 
-  return <h2>{counter.full_name}</h2>;
+  return <h2>{counter.full_name} (using hook)</h2>;
 }
+
+export const ObservedName = observer(() => {
+  console.log('observed name')
+  return <h2>{counterStore.full_name} (using HoC)</h2>;
+})
 
 function Count() {
   const counter = useCounterStore()
@@ -109,6 +114,7 @@ createRoot(document.getElementById("app")!).render(
       <Posts />
     {/* </Suspense> */}
     <Name />
+    <ObservedName />
     <Count />
     <Actions />
     <NestedWrapper />
