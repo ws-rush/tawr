@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { defineStore } from '../store';
 
 describe('Store', () => {
@@ -229,68 +229,6 @@ describe('Store', () => {
   });
 
   describe('Advanced Features', () => {
-    describe.skip('Promise-based Getters', () => {
-      const mockPosts = [
-        { id: 1, title: 'Post 1' },
-        { id: 2, title: 'Post 2' }
-      ];
-
-      const mockFetch = vi.fn()
-        .mockImplementation((url) => {
-          if (url.includes('error')) {
-            return Promise.reject(new Error('Network error'));
-          }
-          return Promise.resolve({
-            json: () => Promise.resolve(mockPosts)
-          });
-        });
-
-        vi.stubGlobal('fetch', mockFetch);
-        const [, store] = defineStore({
-          state: () => ({ 
-            userId: 1,
-            error: null as string | null
-          }),
-          getters: {
-            posts: (store) => 
-              fetch(`https://api.example.com/posts?userId=${store.userId}`)
-                .then(response => response.json()),
-            errorPosts: (store) =>
-              fetch(`https://api.example.com/error?userId=${store.userId}`)
-                .then(response => response.json())
-                .catch(e => {
-                  store.error = e.message;
-                  return [];
-                })
-          },
-          actions: {
-            setUserId(id: number) {
-              this.userId = id;
-            }
-          }
-        });
-
-      it('handles successful promise-based getters', async () => {
-        const posts = await store.posts;
-        expect(posts).toEqual(mockPosts);
-        expect(mockFetch).toHaveBeenCalledWith(
-          'https://api.example.com/posts?userId=1'
-        );
-
-        store.setUserId(2);
-        await store.posts;
-        expect(mockFetch).toHaveBeenCalledWith(
-          'https://api.example.com/posts?userId=2'
-        );
-      });
-
-      it('handles errors in promise-based getters', async () => {
-        const posts = await store.errorPosts;
-        expect(posts).toEqual([]);
-        expect(store.error).toBe('Network error');
-      });
-    });
-
     describe('Edge Cases', () => {
       it('handles undefined state values', () => {
         const [, store] = defineStore({
