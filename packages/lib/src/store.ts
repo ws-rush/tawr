@@ -153,20 +153,6 @@ export function defineStore<
     }
   }
 
-  // Watch queries loading states
-  const watchQueries = () => {
-    if (definition.queries) {
-      for (const key in definition.queries) {
-        const queryState = store[key] as QueryState;
-        queryState.isLoading = queryState.isFetching && queryState.value === undefined;
-      }
-    }
-  }
-
-  // Create effect for watching queries
-  const watchEffect = effect(watchQueries);
-  effects.set('__watch_queries', watchEffect);
-
   // Attach Queries
   if (definition.queries) {
     for (const key in definition.queries) {
@@ -197,6 +183,11 @@ export function defineStore<
 
       const eff = effect(execute);
       effects.set(key, eff)
+
+      // track isLoading with effect
+      effect(() => {
+        store[key].isLoading = store[key].isFetching && store[key].value === undefined;
+      });
     }
   }
 

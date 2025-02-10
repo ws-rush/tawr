@@ -75,7 +75,7 @@ function Count() {
 function Posts() {
   const posts = usePostsStore()
 
-  console.log('posts', posts.posts.value)
+  console.log('posts', posts.posts.isLoading, posts.posts.isFetching)
 
   if (posts.posts.isLoading) return <p>loading ...</p>
   // if (posts.posts.isFetching) return <p>fetching ...</p>

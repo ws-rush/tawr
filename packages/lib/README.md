@@ -3,7 +3,6 @@
 - [ ] Edit API as `useSnapshot(store, options: { value: {}, strategy: 'merge' | 'replace', reset: boolean })`with `$reset` API
 - [-] Add query part
     - [x] baisc functionality, queryFn with states { value, isLoading, isFetching, error }
-    - [ ] split tests by functionality
     - [ ] support `retry`, `selected`, `enabled` props
     - [ ] cache options
     - [ ] initial data and placeholder

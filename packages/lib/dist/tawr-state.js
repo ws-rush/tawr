@@ -15,7 +15,7 @@ function Ze(e) {
 const ke = process.env.NODE_ENV !== "production" ? Object.freeze({}) : {};
 process.env.NODE_ENV !== "production" && Object.freeze([]);
 const et = () => {
-}, ce = Object.assign, tt = Object.prototype.hasOwnProperty, ae = (e, t) => tt.call(e, t), x = Array.isArray, P = (e) => re(e) === "[object Map]", rt = (e) => re(e) === "[object Set]", ye = (e) => typeof e == "function", nt = (e) => typeof e == "string", q = (e) => typeof e == "symbol", z = (e) => e !== null && typeof e == "object", st = Object.prototype.toString, re = (e) => st.call(e), Ie = (e) => re(e).slice(8, -1), it = (e) => re(e) === "[object Object]", ve = (e) => nt(e) && e !== "NaN" && e[0] !== "-" && "" + parseInt(e, 10) === e, ot = (e) => {
+}, ce = Object.assign, tt = Object.prototype.hasOwnProperty, ae = (e, t) => tt.call(e, t), x = Array.isArray, P = (e) => re(e) === "[object Map]", rt = (e) => re(e) === "[object Set]", ye = (e) => typeof e == "function", nt = (e) => typeof e == "string", z = (e) => typeof e == "symbol", Y = (e) => e !== null && typeof e == "object", st = Object.prototype.toString, re = (e) => st.call(e), Ie = (e) => re(e).slice(8, -1), it = (e) => re(e) === "[object Object]", ve = (e) => nt(e) && e !== "NaN" && e[0] !== "-" && "" + parseInt(e, 10) === e, ot = (e) => {
   const t = /* @__PURE__ */ Object.create(null);
   return (r) => t[r] || (t[r] = e(r));
 }, ct = ot((e) => e.charAt(0).toUpperCase() + e.slice(1)), A = (e, t) => !Object.is(e, t);
@@ -79,18 +79,18 @@ class fe {
     return ue(this);
   }
 }
-let Me = 0, H, C;
+let Me = 0, F, C;
 function at(e, t = !1) {
   if (e.flags |= 8, t) {
     e.next = C, C = e;
     return;
   }
-  e.next = H, H = e;
-}
-function _e() {
-  Me++;
+  e.next = F, F = e;
 }
 function ge() {
+  Me++;
+}
+function _e() {
   if (--Me > 0)
     return;
   if (C) {
@@ -101,9 +101,9 @@ function ge() {
     }
   }
   let e;
-  for (; H; ) {
-    let t = H;
-    for (H = void 0; t; ) {
+  for (; F; ) {
+    let t = F;
+    for (F = void 0; t; ) {
       const r = t.next;
       if (t.next = void 0, t.flags &= -9, t.flags & 1)
         try {
@@ -168,7 +168,7 @@ function ut(e) {
   const { prevDep: t, nextDep: r } = e;
   t && (t.nextDep = r, e.prevDep = void 0), r && (r.prevDep = t, e.nextDep = void 0);
 }
-function Z(e, t) {
+function H(e, t) {
   e.effect instanceof fe && (e = e.effect.fn);
   const r = new fe(e);
   try {
@@ -236,7 +236,7 @@ class pt {
     this.version++, ee++, this.notify(t);
   }
   notify(t) {
-    _e();
+    ge();
     try {
       if (process.env.NODE_ENV !== "production")
         for (let r = this.subsHead; r; r = r.nextSub)
@@ -251,7 +251,7 @@ class pt {
       for (let r = this.subs; r; r = r.prevSub)
         r.sub.notify() && r.sub.dep.notify();
     } finally {
-      ge();
+      _e();
     }
   }
 }
@@ -271,10 +271,10 @@ const le = /* @__PURE__ */ new WeakMap(), I = Symbol(
   process.env.NODE_ENV !== "production" ? "Object iterate" : ""
 ), pe = Symbol(
   process.env.NODE_ENV !== "production" ? "Map keys iterate" : ""
-), F = Symbol(
+), q = Symbol(
   process.env.NODE_ENV !== "production" ? "Array iterate" : ""
 );
-function _(e, t, r) {
+function g(e, t, r) {
   if (b && p) {
     let s = le.get(e);
     s || le.set(e, s = /* @__PURE__ */ new Map());
@@ -302,17 +302,17 @@ function O(e, t, r, s, n, i) {
       oldTarget: i
     }) : a.trigger());
   };
-  if (_e(), t === "clear")
+  if (ge(), t === "clear")
     o.forEach(c);
   else {
     const a = x(e), f = a && ve(r);
     if (a && r === "length") {
       const v = Number(s);
       o.forEach((u, d) => {
-        (d === "length" || d === F || !q(d) && d >= v) && c(u);
+        (d === "length" || d === q || !z(d) && d >= v) && c(u);
       });
     } else
-      switch ((r !== void 0 || o.has(void 0)) && c(o.get(r)), f && c(o.get(F)), t) {
+      switch ((r !== void 0 || o.has(void 0)) && c(o.get(r)), f && c(o.get(q)), t) {
         case "add":
           a ? f && c(o.get("length")) : (c(o.get(I)), P(e) && c(o.get(pe)));
           break;
@@ -324,19 +324,19 @@ function O(e, t, r, s, n, i) {
           break;
       }
   }
-  ge();
+  _e();
 }
 function j(e) {
   const t = h(e);
-  return t === e ? t : (_(t, "iterate", F), E(e) ? t : t.map(g));
+  return t === e ? t : (g(t, "iterate", q), E(e) ? t : t.map(_));
 }
 function we(e) {
-  return _(e = h(e), "iterate", F), e;
+  return g(e = h(e), "iterate", q), e;
 }
 const ht = {
   __proto__: null,
   [Symbol.iterator]() {
-    return ie(this, Symbol.iterator, g);
+    return ie(this, Symbol.iterator, _);
   },
   concat(...e) {
     return j(this).concat(
@@ -344,22 +344,22 @@ const ht = {
     );
   },
   entries() {
-    return ie(this, "entries", (e) => (e[1] = g(e[1]), e));
+    return ie(this, "entries", (e) => (e[1] = _(e[1]), e));
   },
   every(e, t) {
     return S(this, "every", e, t, void 0, arguments);
   },
   filter(e, t) {
-    return S(this, "filter", e, t, (r) => r.map(g), arguments);
+    return S(this, "filter", e, t, (r) => r.map(_), arguments);
   },
   find(e, t) {
-    return S(this, "find", e, t, g, arguments);
+    return S(this, "find", e, t, _, arguments);
   },
   findIndex(e, t) {
     return S(this, "findIndex", e, t, void 0, arguments);
   },
   findLast(e, t) {
-    return S(this, "findLast", e, t, g, arguments);
+    return S(this, "findLast", e, t, _, arguments);
   },
   findLastIndex(e, t) {
     return S(this, "findLastIndex", e, t, void 0, arguments);
@@ -419,7 +419,7 @@ const ht = {
     return W(this, "unshift", e);
   },
   values() {
-    return ie(this, "values", g);
+    return ie(this, "values", _);
   }
 };
 function ie(e, t, r) {
@@ -434,11 +434,11 @@ function S(e, t, r, s, n, i) {
   const o = we(e), c = o !== e && !E(e), a = o[t];
   if (a !== dt[t]) {
     const u = a.apply(e, i);
-    return c ? g(u) : u;
+    return c ? _(u) : u;
   }
   let f = r;
   o !== e && (c ? f = function(u, d) {
-    return r.call(this, g(u), d, e);
+    return r.call(this, _(u), d, e);
   } : r.length > 2 && (f = function(u, d) {
     return r.call(this, u, d, e);
   }));
@@ -451,29 +451,29 @@ function xe(e, t, r, s) {
   return n !== e && (E(e) ? r.length > 3 && (i = function(o, c, a) {
     return r.call(this, o, c, a, e);
   }) : i = function(o, c, a) {
-    return r.call(this, o, g(c), a, e);
+    return r.call(this, o, _(c), a, e);
   }), n[t](i, ...s);
 }
 function oe(e, t, r) {
   const s = h(e);
-  _(s, "iterate", F);
+  g(s, "iterate", q);
   const n = s[t](...r);
   return (n === -1 || n === !1) && Rt(r[0]) ? (r[0] = h(r[0]), s[t](...r)) : n;
 }
 function W(e, t, r = []) {
-  Le(), _e();
+  Le(), ge();
   const s = h(e)[t].apply(e, r);
-  return ge(), $e(), s;
+  return _e(), $e(), s;
 }
 const vt = /* @__PURE__ */ Ze("__proto__,__v_isRef,__isVue"), He = new Set(
-  /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((e) => e !== "arguments" && e !== "caller").map((e) => Symbol[e]).filter(q)
+  /* @__PURE__ */ Object.getOwnPropertyNames(Symbol).filter((e) => e !== "arguments" && e !== "caller").map((e) => Symbol[e]).filter(z)
 );
-function _t(e) {
-  q(e) || (e = String(e));
+function gt(e) {
+  z(e) || (e = String(e));
   const t = h(this);
-  return _(t, "has", e), t.hasOwnProperty(e);
+  return g(t, "has", e), t.hasOwnProperty(e);
 }
-class Ce {
+class Fe {
   constructor(t = !1, r = !1) {
     this._isReadonly = t, this._isShallow = r;
   }
@@ -496,7 +496,7 @@ class Ce {
       if (o && (a = ht[r]))
         return a;
       if (r === "hasOwnProperty")
-        return _t;
+        return gt;
     }
     const c = Reflect.get(
       t,
@@ -506,10 +506,10 @@ class Ce {
       // its class methods
       D(t) ? t : s
     );
-    return (q(r) ? He.has(r) : vt(r)) || (n || _(t, "get", r), i) ? c : D(c) ? o && ve(r) ? c : c.value : z(c) ? n ? Se(c) : Ee(c) : c;
+    return (z(r) ? He.has(r) : vt(r)) || (n || g(t, "get", r), i) ? c : D(c) ? o && ve(r) ? c : c.value : Y(c) ? n ? Se(c) : Ee(c) : c;
   }
 }
-class gt extends Ce {
+class _t extends Fe {
   constructor(t = !1) {
     super(!1, t);
   }
@@ -534,17 +534,17 @@ class gt extends Ce {
   }
   has(t, r) {
     const s = Reflect.has(t, r);
-    return (!q(r) || !He.has(r)) && _(t, "has", r), s;
+    return (!z(r) || !He.has(r)) && g(t, "has", r), s;
   }
   ownKeys(t) {
-    return _(
+    return g(
       t,
       "iterate",
       x(t) ? "length" : I
     ), Reflect.ownKeys(t);
   }
 }
-class bt extends Ce {
+class bt extends Fe {
   constructor(t = !1) {
     super(!0, t);
   }
@@ -561,11 +561,11 @@ class bt extends Ce {
     ), !0;
   }
 }
-const wt = /* @__PURE__ */ new gt(), Et = /* @__PURE__ */ new bt(), he = (e) => e, J = (e) => Reflect.getPrototypeOf(e);
+const wt = /* @__PURE__ */ new _t(), Et = /* @__PURE__ */ new bt(), he = (e) => e, Q = (e) => Reflect.getPrototypeOf(e);
 function St(e, t, r) {
   return function(...s) {
-    const n = this.__v_raw, i = h(n), o = P(i), c = e === "entries" || e === Symbol.iterator && o, a = e === "keys" && o, f = n[e](...s), v = r ? he : t ? de : g;
-    return !t && _(
+    const n = this.__v_raw, i = h(n), o = P(i), c = e === "entries" || e === Symbol.iterator && o, a = e === "keys" && o, f = n[e](...s), v = r ? he : t ? de : _;
+    return !t && g(
       i,
       "iterate",
       a ? pe : I
@@ -585,7 +585,7 @@ function St(e, t, r) {
     };
   };
 }
-function Q(e) {
+function X(e) {
   return function(...t) {
     if (process.env.NODE_ENV !== "production") {
       const r = t[0] ? `on key "${t[0]}" ` : "";
@@ -601,8 +601,8 @@ function yt(e, t) {
   const r = {
     get(n) {
       const i = this.__v_raw, o = h(i), c = h(n);
-      e || (A(n, c) && _(o, "get", n), _(o, "get", c));
-      const { has: a } = J(o), f = t ? he : e ? de : g;
+      e || (A(n, c) && g(o, "get", n), g(o, "get", c));
+      const { has: a } = Q(o), f = t ? he : e ? de : _;
       if (a.call(o, n))
         return f(i.get(n));
       if (a.call(o, c))
@@ -611,40 +611,40 @@ function yt(e, t) {
     },
     get size() {
       const n = this.__v_raw;
-      return !e && _(h(n), "iterate", I), Reflect.get(n, "size", n);
+      return !e && g(h(n), "iterate", I), Reflect.get(n, "size", n);
     },
     has(n) {
       const i = this.__v_raw, o = h(i), c = h(n);
-      return e || (A(n, c) && _(o, "has", n), _(o, "has", c)), n === c ? i.has(n) : i.has(n) || i.has(c);
+      return e || (A(n, c) && g(o, "has", n), g(o, "has", c)), n === c ? i.has(n) : i.has(n) || i.has(c);
     },
     forEach(n, i) {
-      const o = this, c = o.__v_raw, a = h(c), f = t ? he : e ? de : g;
-      return !e && _(a, "iterate", I), c.forEach((v, u) => n.call(i, f(v), f(u), o));
+      const o = this, c = o.__v_raw, a = h(c), f = t ? he : e ? de : _;
+      return !e && g(a, "iterate", I), c.forEach((v, u) => n.call(i, f(v), f(u), o));
     }
   };
   return ce(
     r,
     e ? {
-      add: Q("add"),
-      set: Q("set"),
-      delete: Q("delete"),
-      clear: Q("clear")
+      add: X("add"),
+      set: X("set"),
+      delete: X("delete"),
+      clear: X("clear")
     } : {
       add(n) {
         !t && !E(n) && !K(n) && (n = h(n));
         const i = h(this);
-        return J(i).has.call(i, n) || (i.add(n), O(i, "add", n, n)), this;
+        return Q(i).has.call(i, n) || (i.add(n), O(i, "add", n, n)), this;
       },
       set(n, i) {
         !t && !E(i) && !K(i) && (i = h(i));
-        const o = h(this), { has: c, get: a } = J(o);
+        const o = h(this), { has: c, get: a } = Q(o);
         let f = c.call(o, n);
         f ? process.env.NODE_ENV !== "production" && De(o, c, n) : (n = h(n), f = c.call(o, n));
         const v = a.call(o, n);
         return o.set(n, i), f ? A(i, v) && O(o, "set", n, i, v) : O(o, "add", n, i), this;
       },
       delete(n) {
-        const i = h(this), { has: o, get: c } = J(i);
+        const i = h(this), { has: o, get: c } = Q(i);
         let a = o.call(i, n);
         a ? process.env.NODE_ENV !== "production" && De(i, o, n) : (n = h(n), a = o.call(i, n));
         const f = c ? c.call(i, n) : void 0, v = i.delete(n);
@@ -670,7 +670,7 @@ function yt(e, t) {
     r[n] = St(n, e, t);
   }), r;
 }
-function Fe(e, t) {
+function Ce(e, t) {
   const r = yt(e, t);
   return (s, n, i) => n === "__v_isReactive" ? !e : n === "__v_isReadonly" ? e : n === "__v_raw" ? s : Reflect.get(
     ae(r, n) && n in s ? r : s,
@@ -679,9 +679,9 @@ function Fe(e, t) {
   );
 }
 const Ot = {
-  get: /* @__PURE__ */ Fe(!1, !1)
+  get: /* @__PURE__ */ Ce(!1, !1)
 }, mt = {
-  get: /* @__PURE__ */ Fe(!0, !1)
+  get: /* @__PURE__ */ Ce(!0, !1)
 };
 function De(e, t, r) {
   const s = h(r);
@@ -729,7 +729,7 @@ function Se(e) {
   );
 }
 function Ye(e, t, r, s, n) {
-  if (!z(e))
+  if (!Y(e))
     return process.env.NODE_ENV !== "production" && N(
       `value cannot be made ${t ? "readonly" : "reactive"}: ${String(
         e
@@ -765,11 +765,11 @@ function h(e) {
   const t = e && e.__v_raw;
   return t ? h(t) : e;
 }
-const g = (e) => z(e) ? Ee(e) : e, de = (e) => z(e) ? Se(e) : e;
+const _ = (e) => Y(e) ? Ee(e) : e, de = (e) => Y(e) ? Se(e) : e;
 function D(e) {
   return e ? e.__v_isRef === !0 : !1;
 }
-const X = {}, te = /* @__PURE__ */ new WeakMap();
+const Z = {}, te = /* @__PURE__ */ new WeakMap();
 let R;
 function Vt(e, t = !1, r = R) {
   if (r) {
@@ -787,8 +787,8 @@ function At(e, t, r = ke) {
       "A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types."
     );
   }, v = (l) => n ? l : E(l) || n === !1 || n === 0 ? m(l, 1) : m(l);
-  let u, d, L, Y, B = !1, G = !1;
-  if (D(e) ? (d = () => e.value, B = E(e)) : k(e) ? (d = () => v(e), B = !0) : x(e) ? (G = !0, B = e.some((l) => k(l) || E(l)), d = () => e.map((l) => {
+  let u, d, L, B, G = !1, U = !1;
+  if (D(e) ? (d = () => e.value, G = E(e)) : k(e) ? (d = () => v(e), G = !0) : x(e) ? (U = !0, G = e.some((l) => k(l) || E(l)), d = () => e.map((l) => {
     if (D(l))
       return l.value;
     if (k(l))
@@ -808,7 +808,7 @@ function At(e, t, r = ke) {
     const l = R;
     R = u;
     try {
-      return a ? a(e, 3, [Y]) : e(Y);
+      return a ? a(e, 3, [B]) : e(B);
     } finally {
       R = l;
     }
@@ -825,25 +825,25 @@ function At(e, t, r = ke) {
       l(...w), M();
     };
   }
-  let T = G ? new Array(e.length).fill(X) : X;
+  let T = U ? new Array(e.length).fill(Z) : Z;
   const $ = (l) => {
     if (!(!(u.flags & 1) || !u.dirty && !l))
       if (t) {
         const w = u.run();
-        if (n || B || (G ? w.some((ne, U) => A(ne, T[U])) : A(w, T))) {
+        if (n || G || (U ? w.some((ne, J) => A(ne, T[J])) : A(w, T))) {
           L && L();
           const ne = R;
           R = u;
           try {
-            const U = [
+            const J = [
               w,
               // pass undefined as the old value when it's changed for the first time
-              T === X ? void 0 : G && T[0] === X ? [] : T,
-              Y
+              T === Z ? void 0 : U && T[0] === Z ? [] : T,
+              B
             ];
-            a ? a(t, 3, U) : (
+            a ? a(t, 3, J) : (
               // @ts-expect-error
-              t(...U)
+              t(...J)
             ), T = w;
           } finally {
             R = ne;
@@ -852,7 +852,7 @@ function At(e, t, r = ke) {
       } else
         u.run();
   };
-  return c && c($), u = new fe(d), u.scheduler = o ? () => o($, !1) : $, Y = (l) => Vt(l, !1, u), L = u.onStop = () => {
+  return c && c($), u = new fe(d), u.scheduler = o ? () => o($, !1) : $, B = (l) => Vt(l, !1, u), L = u.onStop = () => {
     const l = te.get(u);
     if (l) {
       if (a)
@@ -864,7 +864,7 @@ function At(e, t, r = ke) {
   }, process.env.NODE_ENV !== "production" && (u.onTrack = r.onTrack, u.onTrigger = r.onTrigger), t ? s ? $(!0) : T = u.run() : o ? o($.bind(null, !0), !0) : u.run(), M.pause = u.pause.bind(u), M.resume = u.resume.bind(u), M.stop = M, M;
 }
 function m(e, t = 1 / 0, r) {
-  if (t <= 0 || !z(e) || e.__v_skip || (r = r || /* @__PURE__ */ new Set(), r.has(e)))
+  if (t <= 0 || !Y(e) || e.__v_skip || (r = r || /* @__PURE__ */ new Set(), r.has(e)))
     return e;
   if (r.add(e), t--, D(e))
     m(e.value, t, r);
@@ -921,7 +921,7 @@ function Pt(e) {
     $invalidate(i) {
       i.forEach((o) => {
         y.get(o) && Oe(y.get(o));
-        const c = Z(() => {
+        const c = H(() => {
           const a = e.getters, f = e.queries;
           if (a && Ne(a, o))
             r[o] = a[o](r);
@@ -943,7 +943,7 @@ function Pt(e) {
     r[i] = s[i].bind(r);
   if (e.getters)
     for (const i in e.getters) {
-      const o = Z(() => {
+      const o = H(() => {
         r[i] = e.getters[i](r);
       });
       y.set(i, o);
@@ -956,7 +956,7 @@ function Pt(e) {
         isFetching: !1,
         error: null
       };
-      const c = Z(async () => {
+      const c = H(async () => {
         const a = r[i];
         a.isFetching = !0;
         const f = e.queries[i](r);
@@ -968,7 +968,9 @@ function Pt(e) {
           a.isFetching = !1;
         });
       });
-      y.set(i, c);
+      y.set(i, c), H(() => {
+        r[i].isLoading = r[i].isFetching && r[i].value === void 0;
+      });
     }
   return [() => It(r), r];
 }
@@ -1007,7 +1009,7 @@ function Kt({
 const Lt = (e) => (t) => {
   const [, r] = Ve(0);
   return Ae(() => {
-    const s = Z(() => {
+    const s = H(() => {
       e(), r((n) => n + 1);
     });
     return () => {
