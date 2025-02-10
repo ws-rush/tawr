@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { readonly, watch } from "@vue/reactivity";
-import { Actions, Getters, Store } from "./store";
+import { Actions, Getters, Queries, Store } from "./store";
 
-export function useSnapshot<T extends object, G extends Getters<T>, A extends Actions<T, G>>(store: Store<T, G, A>): Store<T, G, A> {
-  const state = readonly(store) as Store<T, G, A>;
+export function useSnapshot<T extends object, G extends Getters<T>, Q extends Queries<T>,A extends Actions<T, G, Q>>(store: Store<T, G, Q, A>): Store<T, G, Q, A> {
+  const state = readonly(store) as Store<T, G, Q, A>;
   const usedKeys = useRef(new Set<string>()); // Tracks accessed keys
   const [, forceRender] = useState(0); // Triggers re-renders
 

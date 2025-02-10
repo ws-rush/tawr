@@ -75,12 +75,18 @@ function Count() {
 function Posts() {
   const posts = usePostsStore()
 
+  console.log('posts', posts.posts.value)
+
+  if (posts.posts.isLoading) return <p>loading ...</p>
+  // if (posts.posts.isFetching) return <p>fetching ...</p>
+
   return (
     <ul>
-      <Awaitable resolve={posts.posts}
+      {/* <Awaitable resolve={posts.posts}
          fallback={<p>loading ...</p>}
          error={(e) => <p>{e.message}</p>} 
-         children={(posts) => (posts as any).map((post: any) => <li key={post.id}>{post.title}</li>)} />
+         children={(posts) => (posts as any).map((post: any) => <li key={post.id}>{post.title}</li>)} /> */}
+         {(posts as any).posts.value?.map((post: any) => <li key={post.id}>{post.title}</li>)}
     </ul>
   );
 }

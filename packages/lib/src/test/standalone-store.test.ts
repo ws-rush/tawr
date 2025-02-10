@@ -387,7 +387,6 @@ describe('Store', () => {
       });
 
       it('maintains reactivity when updating array elements', () => {
-
         // Update the first todo's subtasks
         const updatedTodoFirst = {
           ...store.todos[0],
@@ -423,6 +422,93 @@ describe('Store', () => {
         store.todos = store.todos.slice(1);
         
         expect(store.completedSubtasks).toBe(2);
+      });
+    });
+  });
+
+  describe('Query Features', () => {
+    describe('Query Operations with $invalidate and $underive', () => {
+      it('should invalidate and re-run queries', async () => {
+        let count = 0;
+        const [, store] = defineStore({
+          queries: {
+            test() {
+              return {
+                fn: async () => {
+                  count++;
+                  return count;
+                }
+              };
+            }
+          }
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(store.test.value).toBe(1);
+
+        store.$invalidate(['test']);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(store.test.value).toBe(2);
+      });
+
+      it('should stop query effects when using $underive', async () => {
+        let count = 0;
+        const [, store] = defineStore({
+          state: () => ({ trigger: 0 }),
+          queries: {
+            test(store) {
+              return {
+                fn: async () => {
+                  count++;
+                  return store.trigger + count;
+                }
+              };
+            }
+          }
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(store.test.value).toBe(1);
+
+        store.$underive(['test']);
+        store.trigger = 1;
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(store.test.value).toBe(1); // Value should not change after underive
+      });
+
+      it('should handle mixed getter and query operations', async () => {
+        let queryCount = 0;
+        const [, store] = defineStore({
+          state: () => ({ value: 1 }),
+          getters: {
+            doubled: (store) => store.value * 2
+          },
+          queries: {
+            test() {
+              return {
+                fn: async () => {
+                  queryCount++;
+                  return queryCount;
+                }
+              };
+            }
+          }
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(store.test.value).toBe(1);
+        expect(store.doubled).toBe(2);
+
+        store.$underive(['test', 'doubled']);
+        store.value = 2;
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(store.test.value).toBe(1); // Query stays underived
+        expect(store.doubled).toBe(2); // Getter stays underived
+
+        store.$invalidate(['test', 'doubled']);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(store.test.value).toBe(2); // Query re-runs
+        expect(store.doubled).toBe(4); // Getter updates
       });
     });
   });
