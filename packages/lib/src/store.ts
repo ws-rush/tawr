@@ -165,12 +165,10 @@ export function defineStore<
       const execute = async () => {
         const queryState = store[key] as QueryState;
         queryState.isFetching = true;
-        queryState.isLoading = true;
         const query = definition.queries![key](store)
         if (!query) {
           queryState.error = new Error('Query not found')
           queryState.isFetching = false
-          queryState.isLoading = false
           return
         }
         
@@ -179,7 +177,6 @@ export function defineStore<
           .catch((error: any) => queryState.error = error)
           .finally(() => {
             queryState.isFetching = false;
-            queryState.isLoading = false;
           })
         }
 
@@ -187,9 +184,9 @@ export function defineStore<
       effects.set(key, eff)
 
       // track isLoading with effect
-      // effect(() => {
-      //   store[key].isLoading = store[key].isFetching && store[key].value === undefined;
-      // });
+      effect(() => {
+        store[key].isLoading = store[key].isFetching && store[key].value === undefined;
+      });
     }
   }
 

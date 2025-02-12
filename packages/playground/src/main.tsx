@@ -75,8 +75,10 @@ function Count() {
 function Posts() {
   const posts = useObserve(postsStore)
 
-  if (posts.randoms.isLoading) return <p>loading ...</p>
+  console.log('posts loading', posts.posts)
+  // if (posts.randoms.isLoading) return <p>loading ...</p>
   if (posts.posts.isLoading) return <p>loading ...</p>
+
 
   return (
     <ul>
