@@ -48,5 +48,5 @@ export type StoreDefinition<T extends object, G extends Getters<T> = Getters<T>,
     actions?: A;
     queries?: Q;
 };
-export declare function defineStore<T extends object, G extends Getters<T> = Getters<T>, Q extends Queries<T> = Queries<T>, A extends Actions<T, G, Q> = Actions<T, G, Q>>(definition: StoreDefinition<T, G, Q, A>): [() => Store<T, G, A, Q>, Store<T, G, A, Q>];
+export declare function defineStore<T extends object, G extends Getters<T> = Getters<T>, Q extends Queries<T> = Queries<T>, A extends Actions<T, G, Q> = Actions<T, G, Q>>(definition: StoreDefinition<T, G, Q, A>): Store<T, G, A, Q>;
 export {};

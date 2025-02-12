@@ -3,7 +3,7 @@ import { defineStore } from '../store';
 
 describe('Actions', () => {
   describe('Synchronous Actions', () => {
-    const [, store] = defineStore({
+    const store = defineStore({
       state: () => ({ count: 0 }),
       actions: {
         increment() {
@@ -31,7 +31,7 @@ describe('Actions', () => {
     });
 
     it('properly binds this context', () => {
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({ count: 0 }),
         getters: {
           doubled: (store) => store.count * 2
@@ -54,7 +54,7 @@ describe('Actions', () => {
   });
 
   describe('Asynchronous Actions', () => {
-    const [, store] = defineStore({
+    const store = defineStore({
       state: () => ({ 
         count: 0,
         isLoading: false,
@@ -105,7 +105,7 @@ describe('Actions', () => {
   });
 
   describe('Actions with Dependencies', () => {
-    const [, store] = defineStore({
+    const store = defineStore({
       state: () => ({
         items: [] as string[],
         isLoading: false
@@ -147,7 +147,7 @@ describe('Actions', () => {
         save: vi.fn()
       };
 
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({ value: '' }),
         actions: {
           async save(newValue: string) {
@@ -165,7 +165,7 @@ describe('Actions', () => {
 
   describe('Action Error Handling', () => {
     it('handles errors in action chain', async () => {
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({
           value: '',
           error: null as string | null,

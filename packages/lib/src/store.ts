@@ -1,5 +1,4 @@
 import { reactive,  effect, stop } from "@vue/reactivity";
-import { useSnapshot } from "./use-snapshot";
 
 // Helper type to get keys from both getters and queries
 type StoreKeys<G, Q> = keyof (GettersReturn<G> & QueriesReturn<Q>);
@@ -99,7 +98,7 @@ export function defineStore<
   A extends Actions<T, G, Q> = Actions<T, G, Q>
 >(
   definition: StoreDefinition<T, G, Q, A>
-): [() => Store<T, G, A, Q>, Store<T, G, A, Q>] {
+): Store<T, G, A, Q> {
   const initialState = definition.state?.() ?? {};
   const store = reactive(initialState) as Store<T, G, A, Q>;
 
@@ -166,10 +165,12 @@ export function defineStore<
       const execute = async () => {
         const queryState = store[key] as QueryState;
         queryState.isFetching = true;
+        queryState.isLoading = true;
         const query = definition.queries![key](store)
         if (!query) {
           queryState.error = new Error('Query not found')
           queryState.isFetching = false
+          queryState.isLoading = false
           return
         }
         
@@ -178,6 +179,7 @@ export function defineStore<
           .catch((error: any) => queryState.error = error)
           .finally(() => {
             queryState.isFetching = false;
+            queryState.isLoading = false;
           })
         }
 
@@ -185,11 +187,11 @@ export function defineStore<
       effects.set(key, eff)
 
       // track isLoading with effect
-      effect(() => {
-        store[key].isLoading = store[key].isFetching && store[key].value === undefined;
-      });
+      // effect(() => {
+      //   store[key].isLoading = store[key].isFetching && store[key].value === undefined;
+      // });
     }
   }
 
-  return [() => useSnapshot(store), store];
+  return store;
 }

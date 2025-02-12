@@ -1,6 +1,6 @@
 import { defineStore } from "tawr-state";
 
-export const [useNestedStore, nestedStore] = defineStore({
+export const nestedStore = defineStore({
     state: () => ({
       user: {
         profile: {

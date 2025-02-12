@@ -1,6 +1,6 @@
 import { defineStore } from "tawr-state"
 
-export const [useCounterStore, counterStore] = defineStore({
+export const counterStore = defineStore({
   getters: {
     doubleCount: (store) => store.count * 2,
     quadroCount: (store) => store.doubleCount * 2,

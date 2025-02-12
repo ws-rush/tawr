@@ -1,19 +1,19 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 
-import { counterStore, useCounterStore } from "./countreStore";
-import { Awaitable, _observer as observer } from "tawr-state";
-import { postsStore, usePostsStore } from "./postsStore";
-import { nestedStore, useNestedStore } from "./nestedStore";
+import { counterStore } from "./countreStore";
+import { _observer as observer, useObserve } from "tawr-state";
+import { postsStore } from "./postsStore";
+import { nestedStore } from "./nestedStore";
 
 const NestedWrapper = () => {
-  const snapshot = useNestedStore();
+  const user = useObserve(nestedStore.user);
 
   return (
     <div>
-      <div>{snapshot.user.profile.name}</div>
-      <div>{snapshot.user.profile.settings.theme}</div>
-      <div>{snapshot.user.stats.visits}</div>
+      <div>{user.profile.name}</div>
+      <div>{user.profile.settings.theme}</div>
+      <div>{user.stats.visits}</div>
 
       <div>
         <button type="button" onClick={() => nestedStore.user.profile.name = "wusaby"}>chnage name</button>
@@ -52,9 +52,9 @@ function Actions() {
 }
 
 function Name() {
-  const counter = useCounterStore()
+  const full_name = useObserve(counterStore.full_name)
 
-  return <h2>{counter.full_name} (using hook)</h2>;
+  return <h2>{full_name} (using hook)</h2>;
 }
 
 export const ObservedName = observer(() => {
@@ -63,30 +63,26 @@ export const ObservedName = observer(() => {
 })
 
 function Count() {
-  const counter = useCounterStore()
+  const counter = useObserve(counterStore)
 
   return <>
-  <p>count: {counter.count}</p>
-  <p>double count: {counter.doubleCount}</p>
-  <p>quadro count: {counter.quadroCount}</p>
+    <p>count: {counter.count}</p>
+    <p>double count: {counter.doubleCount}</p>
+    <p>quadro count: {counter.quadroCount}</p>
   </>;
 }
 
 function Posts() {
-  const posts = usePostsStore()
+  const posts = useObserve(postsStore)
 
-  console.log('posts', posts.posts.isLoading, posts.posts.isFetching)
-
+  if (posts.randoms.isLoading) return <p>loading ...</p>
   if (posts.posts.isLoading) return <p>loading ...</p>
-  // if (posts.posts.isFetching) return <p>fetching ...</p>
 
   return (
     <ul>
-      {/* <Awaitable resolve={posts.posts}
-         fallback={<p>loading ...</p>}
-         error={(e) => <p>{e.message}</p>} 
-         children={(posts) => (posts as any).map((post: any) => <li key={post.id}>{post.title}</li>)} /> */}
-         {(posts as any).posts.value?.map((post: any) => <li key={post.id}>{post.title}</li>)}
+      {(posts as any).posts.value?.map((post: any) => <li key={post.id}>{post.title}</li>)}
+      <p>randoms: {JSON.stringify(posts.randoms.value)}</p>
+      <button type="button" onClick={() => posts.regenerate()}>regenerate</button>
     </ul>
   );
 }
@@ -113,17 +109,27 @@ function Posts() {
 //   );
 // }
 
+// function Randoms() {
+//   const posts = usePostsStore()
+
+//   return <>
+//     <p>randoms: {JSON.stringify(posts.randoms.value)}</p>
+//     <button type="button" onClick={() => posts.regenerate()}>regenerate</button>
+//   </>
+// }
+
 createRoot(document.getElementById("app")!).render(
   <React.StrictMode>
     <input type="number" onChange={(e) => postsStore.setUserId(Number(e.target.value))} defaultValue={1} />
     {/* <Suspense fallback={<p>loading ...</p>}> */}
-      <Posts />
+    <Posts />
     {/* </Suspense> */}
     <Name />
     <ObservedName />
     <Count />
     <Actions />
     <NestedWrapper />
+    {/* <Randoms /> */}
   </React.StrictMode>
 );
 

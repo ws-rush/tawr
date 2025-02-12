@@ -4,7 +4,7 @@ import { defineStore } from '../store';
 describe('State', () => {
   describe('Basic State Operations', () => {
     it('initializes with correct state', () => {
-      const [,store] = defineStore({
+      const store = defineStore({
         state: () => ({ count: 0, first_name: 'john', last_name: 'doe' })
       });
       expect(store.count).toBe(0);
@@ -13,7 +13,7 @@ describe('State', () => {
     });
 
     it('handles undefined state values', () => {
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({ value: undefined as undefined | number })
       });
       expect(store.value).toBeUndefined();
@@ -22,7 +22,7 @@ describe('State', () => {
     });
 
     it('handles null state values', () => {
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({ value: null as null | number })
       });
       expect(store.value).toBeNull();
@@ -31,7 +31,7 @@ describe('State', () => {
     });
 
     it('handles empty state', () => {
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({})
       });
       const stateKeys = Object.keys(store).filter(key => !key.startsWith('$'));
@@ -41,7 +41,7 @@ describe('State', () => {
 
   describe('Nested State Reactivity', () => {
     describe('Object Nesting', () => {
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({
           user: {
             profile: {
@@ -83,7 +83,7 @@ describe('State', () => {
     });
 
     describe('Array Nesting', () => {
-      const [, store] = defineStore({
+      const store = defineStore({
         state: () => ({
           todos: [
             { 

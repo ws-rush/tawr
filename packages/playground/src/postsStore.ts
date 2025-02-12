@@ -1,6 +1,6 @@
 import { defineStore } from "tawr-state";
 
-export const [usePostsStore, postsStore] = defineStore({
+export const postsStore = defineStore({
   state: () => ({
     userId: 0,
   }),
@@ -12,10 +12,24 @@ export const [usePostsStore, postsStore] = defineStore({
           .then((response) => response.json());
       }
     }),
+    randoms: () => ({
+      fn: () => {
+        const data = { nested: { values: { inothers: { give: Math.random() } } } };
+        console.log('randoms', data);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(data);
+          }, 2000);
+        });
+      }
+    })
   },
   actions: {
     setUserId(userId: number) {
       this.userId = userId;
     },
+    regenerate() {
+      this.$invalidate(['randoms'])
+    }
   },
 });

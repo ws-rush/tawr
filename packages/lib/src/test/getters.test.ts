@@ -3,7 +3,7 @@ import { defineStore } from '../store';
 
 describe('Getters', () => {
   describe('Basic Getters', () => {
-    const [, store] = defineStore({
+    const store = defineStore({
       state: () => ({ value: 1 }),
       getters: {
         doubled: (store) => store.value * 2,
@@ -22,7 +22,7 @@ describe('Getters', () => {
   });
 
   describe('Dependent Getters', () => {
-    const [, store] = defineStore({
+    const store = defineStore({
       state: () => ({ count: 1 }),
       getters: {
         double: (store) => store.count * 2,
@@ -78,7 +78,7 @@ describe('Getters', () => {
   });
 
   describe('Complex Getter Dependencies', () => {
-    const [, store] = defineStore({
+    const store = defineStore({
       state: () => ({ 
         firstName: 'John',
         lastName: 'Doe',
@@ -130,7 +130,7 @@ describe('Getters', () => {
   });
 
   describe('Getters with Object/Array Returns', () => {
-    const [, store] = defineStore({
+    const store = defineStore({
       state: () => ({
         items: [1, 2, 3, 4, 5],
         config: { multiplier: 2 }
