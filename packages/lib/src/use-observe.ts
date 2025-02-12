@@ -1,62 +1,59 @@
-import { useState, useEffect } from "react";
-import { readonly, watch } from "@vue/reactivity";
+import { useState, useEffect, useRef } from 'react';
+import { effect } from '@vue/reactivity';
 
-type ObservableValue<T> = T extends Array<infer U> ? U[] : T;
+export function useObserve<T>(getter: () => T): T {
+  // Store the getter in a ref so its identity is stable within the hook.
+  const getterRef = useRef(getter);
+  // Always update the current getter reference.
+  getterRef.current = getter;
 
-export function useObserve<T>(value: T): ObservableValue<T> {
-  // Handle array of functions
-  if (Array.isArray(value)) {
-    const states = value.map(v => 
-      typeof v === 'object' && v !== null ? readonly(v) : v
-    );
-    const [, forceRender] = useState(0);
+  const [, forceUpdate] = useState(0);
 
-    useEffect(() => {
-      const stops = states.map((state, index) => {
-        // For primitive values, we don't need to watch
-        if (typeof value[index] !== 'object' || value[index] === null) {
-          return null;
-        }
-        
-        return watch(
-          () => state,
-          () => {
-            forceRender(c => c + 1);
-          },
-          { deep: true }
-        );
-      });
-
-      return () => {
-        stops.forEach(stop => stop?.());
-      };
-    }, []);
-
-    return states as ObservableValue<T>;
-  }
-
-  // Handle single value
-  const state = typeof value === 'object' && value !== null ? readonly(value) : value;
-  const [, forceRender] = useState(0);
+  // Compute the current value (this will be stale until forceUpdate re-renders, but that’s okay)
+  const value = getterRef.current();
 
   useEffect(() => {
-    // For primitive values, we don't need to watch since they're immutable
-    if (typeof value !== 'object' || value === null) {
-      return;
-    }
-    
-    const stop = watch(
-      () => state,
-      () => {
-        forceRender(c => c + 1);
-      },
-      { deep: true }
-    );
+    const stopEffect = effect(() => {
+      const val = getterRef.current();
 
-    return () => {
-      stop();
-    };
-  }, []);
+      if (Array.isArray(val)) {
+        // Access each item to establish reactivity
+        val.forEach(item => {
+          if (item && typeof item === 'object') {
+            Object.keys(item).forEach(key => {
+              // Access each property so that the dependency is tracked
+              // @ts-expect-error
+              const _ = item[key];
+            });
+          }
+        });
+      } else if (val && typeof val === 'object') {
+        // For objects, recursively access all properties
+        const accessProperties = (obj: any) => {
+          Object.keys(obj).forEach(key => {
+            const child = obj[key];
+            if (child && typeof child === 'object') {
+              accessProperties(child);
+            } else {
+              // Simply reading the primitive is enough
+              // @ts-expect-error
+              const dummy = child;
+            }
+          });
+        };
+        accessProperties(val);
+      } else {
+        // For primitives, just read the value
+        // @ts-expect-error
+        const dummy = val;
+      }
 
-  return state as ObservableValue<T>;
+      // Force a re-render when any reactive dependency changes.
+      forceUpdate(v => v + 1);
+    });
+
+    return () => stopEffect();
+  }, []); // Empty dependency array: we only set up the effect once.
+
+  return value;
 }

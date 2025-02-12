@@ -7,7 +7,7 @@ import { postsStore } from "./postsStore";
 import { nestedStore } from "./nestedStore";
 
 const NestedWrapper = () => {
-  const user = useObserve(nestedStore.user);
+  const user = useObserve(() => nestedStore.user);
 
   return (
     <div>
@@ -52,7 +52,7 @@ function Actions() {
 }
 
 function Name() {
-  const full_name = useObserve(counterStore.full_name)
+  const full_name = useObserve(() => counterStore.full_name)
 
   return <h2>{full_name} (using hook)</h2>;
 }
@@ -63,7 +63,7 @@ export const ObservedName = observer(() => {
 })
 
 function Count() {
-  const counter = useObserve(counterStore)
+  const counter = useObserve(() => counterStore)
 
   return <>
     <p>count: {counter.count}</p>
@@ -73,7 +73,7 @@ function Count() {
 }
 
 function Posts() {
-  const [posts, randoms] = useObserve([postsStore.posts, postsStore.randoms])
+  const [posts, randoms] = useObserve(() => [postsStore.posts, postsStore.randoms])
 
   console.log('posts loading', posts)
   // if (posts.randoms.isLoading) return <p>loading ...</p>
