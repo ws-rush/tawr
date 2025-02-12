@@ -73,18 +73,18 @@ function Count() {
 }
 
 function Posts() {
-  const posts = useObserve(postsStore)
+  const [posts, randoms] = useObserve([postsStore.posts, postsStore.randoms])
 
-  console.log('posts loading', posts.posts)
+  console.log('posts loading', posts)
   // if (posts.randoms.isLoading) return <p>loading ...</p>
-  if (posts.posts.isLoading) return <p>loading ...</p>
+  if (posts.isLoading) return <p>loading ...</p>
 
 
   return (
     <ul>
-      {(posts as any).posts.value?.map((post: any) => <li key={post.id}>{post.title}</li>)}
-      <p>randoms: {JSON.stringify(posts.randoms.value)}</p>
-      <button type="button" onClick={() => posts.regenerate()}>regenerate</button>
+      {posts.value?.map((post: any) => <li key={post.id}>{post.title}</li>)}
+      <p>randoms: {JSON.stringify(randoms.value)}</p>
+      <button type="button" onClick={() => postsStore.regenerate()}>regenerate</button>
     </ul>
   );
 }
