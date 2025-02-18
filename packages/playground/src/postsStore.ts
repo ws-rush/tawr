@@ -4,6 +4,12 @@ export const postsStore = defineStore({
   state: () => ({
     userId: 0,
   }),
+  getters: {
+    getMainList: (state) => {
+      const id = state.userId
+      return id
+    }
+  },
   queries: {
     posts: (store) => ({
       fn: () => {
@@ -32,4 +38,4 @@ export const postsStore = defineStore({
       this.$invalidate(['randoms'])
     }
   },
-});
+})

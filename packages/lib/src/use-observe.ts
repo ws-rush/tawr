@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { effect } from '@vue/reactivity';
 
@@ -9,46 +10,39 @@ export function useObserve<T>(getter: () => T): T {
 
   const [, forceUpdate] = useState(0);
 
-  // Compute the current value (this will be stale until forceUpdate re-renders, but that’s okay)
+  // Compute the current value (this will be stale until forceUpdate re-renders, but that's okay)
   const value = getterRef.current();
 
   useEffect(() => {
     const stopEffect = effect(() => {
       const val = getterRef.current();
 
-      if (Array.isArray(val)) {
-        // Access each item to establish reactivity
-        val.forEach(item => {
-          if (item && typeof item === 'object') {
-            Object.keys(item).forEach(key => {
-              // Access each property so that the dependency is tracked
-              // @ts-expect-error
-              const _ = item[key];
-            });
-          }
-        });
-      } else if (val && typeof val === 'object') {
-        // For objects, recursively access all properties
-        const accessProperties = (obj: any) => {
-          Object.keys(obj).forEach(key => {
-            const child = obj[key];
-            if (child && typeof child === 'object') {
-              accessProperties(child);
-            } else {
-              // Simply reading the primitive is enough
-              // @ts-expect-error
-              const dummy = child;
+      // Helper function to recursively track reactive properties
+      const trackReactivity = <V>(obj: V): void => {
+        if (Array.isArray(obj)) {
+          obj.forEach(item => {
+            if (item && typeof item === 'object') {
+              trackReactivity(item);
             }
           });
-        };
-        accessProperties(val);
-      } else {
-        // For primitives, just read the value
-        // @ts-expect-error
-        const dummy = val;
-      }
+        } else if (obj && typeof obj === 'object') {
+          // Use type parameter to preserve exact types
+          const entries = Object.entries(obj as object);
+          for (const [key, value] of entries) {
+            // Track the value by accessing it
+            void (obj as any)[key];
+            // Recursively track nested objects
+            if (value && typeof value === 'object') {
+              trackReactivity(value);
+            }
+          }
+        }
+      };
 
-      // Force a re-render when any reactive dependency changes.
+      // Track all reactive properties
+      trackReactivity(val);
+      
+      // Force a re-render when any reactive dependency changes
       forceUpdate(v => v + 1);
     });
 

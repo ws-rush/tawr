@@ -1,7 +1,7 @@
 {
   "scripts": {
     "playground": "pnpm --filter @tawr/playground",
-    "lib": "pnpm --filter tawr-state"
+    "lib": "pnpm --filter @tawr/state"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
