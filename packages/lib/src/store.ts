@@ -1,39 +1,24 @@
-import { reactive, effect, stop } from "@vue/reactivity";
+import { reactive, effect, stop, computed } from "@vue/reactivity";
 
 /* ─── HELPER TYPES ────────────────────────────────────────────── */
 
-// The computed return types for a getters map.
 export type GettersReturn<G> = {
   [K in keyof G]: G[K] extends (state: any) => infer R ? R : never;
 };
 
-// The computed “query state” types for a queries map.
 export type QueriesReturn<Q> = {
-  [K in keyof Q]: Q[K] extends (state: any) => Query<infer T> ? QueryState<T> : never;
+  [K in keyof Q]: Q[K] extends (state: any) => Query<infer T>
+    ? QueryState<T>
+    : never;
 };
 
-/**
- * The full store state (used inside getters, queries, and actions)
- * consists of:
- *  - the raw state,
- *  - computed getters,
- *  - reactive query states.
- */
 export type StoreStateType<T, G, Q> = T & GettersReturn<G> & QueriesReturn<Q>;
 
-/**
- * The two “special” methods available on the store.
- * (The keys here are derived from the union of getter and query keys.)
- */
 export type SpecialActions<G, Q> = {
   $underive(keys: (keyof (GettersReturn<G> & QueriesReturn<Q>))[]): void;
   $invalidate(keys: (keyof (GettersReturn<G> & QueriesReturn<Q>))[]): void;
 };
 
-/**
- * Actions get `this` as the complete store (state, getters, queries)
- * plus the two special methods.
- */
 export type Actions<T, G, Q> = {
   [K: string]: (
     this: StoreStateType<T, G, Q> & SpecialActions<G, Q>,
@@ -41,11 +26,6 @@ export type Actions<T, G, Q> = {
   ) => any;
 };
 
-/**
- * The final store type.
- * In addition to raw state, getters and query states,
- * each action is “unwrapped” so that it appears as a normal method.
- */
 export type Store<T, G, Q, A extends Actions<T, G, Q>> =
   StoreStateType<T, G, Q> & {
     [K in keyof A]: A[K] extends (
@@ -58,14 +38,11 @@ export type Store<T, G, Q, A extends Actions<T, G, Q>> =
 
 /* ─── QUERY TYPES ─────────────────────────────────────────────── */
 
-// A query’s function returns a promise.
 export type QueryFunction<T> = () => Promise<T>;
 
-// A query is defined by its function.
 export type QueryDefinition<T> = { fn: QueryFunction<T> };
 export type Query<T> = QueryDefinition<T>;
 
-// The reactive “query state” that will appear on the store.
 export type QueryState<T> = {
   value: T | undefined;
   isLoading: boolean;
@@ -75,18 +52,6 @@ export type QueryState<T> = {
 
 /* ─── STORE DEFINITION ────────────────────────────────────────── */
 
-/**
- * The store definition accepts:
- *  - a raw state creator,
- *  - a set of getters (each receiving the full store state),
- *  - a set of queries (each receiving the full store state and returning a Query),
- *  - a set of actions.
- *
- * The generics enforce that:
- *  - `G` extends a map of functions taking a StoreStateType,
- *  - `Q` extends a map of functions taking a StoreStateType and returning a Query,
- *  - `A` extends Actions using those types.
- */
 export type StoreDefinition<
   T extends object,
   G extends Record<string, (state: StoreStateType<T, G, Q>) => any> = {},
@@ -101,16 +66,31 @@ export type StoreDefinition<
 
 /* ─── IMPLEMENTATION ───────────────────────────────────────────── */
 
+// Global effects map for non‑lazy getters (if needed)
 const effects = new Map<string, ReturnType<typeof effect>>();
 
-// Helper: check if an object has a given key.
-function hasKey<T extends object>(
-  obj: T | undefined,
-  key: PropertyKey
-): key is keyof T {
-  return obj !== undefined && key in obj;
-}
+/**
+ * For lazy queries we keep per‑query data in this map.
+ * Each entry stores:
+ *  - whether the query’s effect has been initialized,
+ *  - the effect reference (if any),
+ *  - and the reactive query state.
+ */
+type LazyData = {
+  initialized: boolean;
+  queryEff: ReturnType<typeof effect> | null;
+  queryState: QueryState<any>;
+};
+const lazyQueryData = new Map<string, LazyData>();
 
+/**
+ * defineStore creates a reactive store with lazy getters and lazy queries.
+ * 
+ * - Getters are wrapped in computed() so they are only evaluated on access.
+ * - Queries are defined as lazy properties that initialize their effect on first access.
+ * - Calling $invalidate or $underive on a query key stops its effect and resets its state,
+ *   so that the next access reinitializes and re‑runs the query.
+ */
 export function defineStore<
   T extends object,
   G extends Record<string, (state: StoreStateType<T, G, Q>) => any>,
@@ -118,118 +98,145 @@ export function defineStore<
   A extends Actions<T, G, Q>
 >(definition: StoreDefinition<T, G, Q, A>): Store<T, G, Q, A> {
   const initialState = definition.state ? definition.state() : ({} as T);
-  // Create a reactive store seeded with the raw state.
+  // First cast to unknown then to Store.
   const store = reactive(initialState) as unknown as Store<T, G, Q, A>;
 
-  // ─── Attach Actions (including the two special methods) ───────
-
+  // ─── Attach Special Actions & User Actions ───────────────
   const allActions: Record<string, Function> & SpecialActions<G, Q> = {
     ...(definition.actions || {}),
+
     $underive(keys: (keyof (GettersReturn<G> & QueriesReturn<Q>))[]) {
       keys.forEach((key) => {
-        const eff = effects.get(String(key));
-        if (eff) stop(eff);
-        effects.delete(String(key));
+        const keyStr = String(key);
+        if (lazyQueryData.has(keyStr)) {
+          const data = lazyQueryData.get(keyStr)!;
+          if (data.queryEff) {
+            stop(data.queryEff);
+            data.queryEff = null;
+          }
+          data.initialized = false;
+          // Reset the query state
+          data.queryState.value = undefined;
+          data.queryState.error = null;
+          data.queryState.isFetching = false;
+          data.queryState.isLoading = false;
+          effects.delete(keyStr);
+        } else {
+          const eff = effects.get(keyStr);
+          if (eff) {
+            stop(eff);
+            effects.delete(keyStr);
+          }
+        }
       });
     },
+
     $invalidate(keys: (keyof (GettersReturn<G> & QueriesReturn<Q>))[]) {
       keys.forEach((key) => {
-        const eff = effects.get(String(key));
-        if (eff) stop(eff);
-        // Create a new effect to re-run the getter or query.
-        const newEff = effect(() => {
-          if (definition.getters && hasKey(definition.getters, key)) {
-            const getterFn = definition.getters[key] as (
-              state: StoreStateType<T, G, Q>
-            ) => any;
-            store[key as keyof Store<T, G, Q, A>] = getterFn(store);
-          } else if (definition.queries && hasKey(definition.queries, key)) {
-            const query = definition.queries[key](store);
-            if (query) {
-              const queryState = store[
-                key as keyof Store<T, G, Q, A>
-              ] as unknown as QueryState<any>;
-              queryState.isFetching = true;
-              query
-                .fn()
-                .then((value: any) => {
-                  queryState.value = value;
-                  queryState.error = null;
-                })
-                .catch((error: Error) => {
-                  queryState.error = error;
-                })
-                .finally(() => {
-                  queryState.isFetching = false;
-                });
-            }
+        const keyStr = String(key);
+        if (lazyQueryData.has(keyStr)) {
+          const data = lazyQueryData.get(keyStr)!;
+          if (data.queryEff) {
+            stop(data.queryEff);
+            data.queryEff = null;
           }
-        });
-        effects.set(String(key), newEff);
+          data.initialized = false;
+          // Reset the query state
+          data.queryState.value = undefined;
+          data.queryState.error = null;
+          data.queryState.isFetching = false;
+          data.queryState.isLoading = false;
+          effects.delete(keyStr);
+        } else {
+          const eff = effects.get(keyStr);
+          if (eff) {
+            stop(eff);
+            effects.delete(keyStr);
+          }
+        }
       });
     }
   };
 
-  // Bind each action so that its `this` is the store.
+  // Bind each action to the store.
   for (const key in allActions) {
     store[key as keyof Store<T, G, Q, A>] = allActions[key].bind(store);
   }
 
-  // ─── Attach Queries ────────────────────────────────────────────
-
-  if (definition.queries) {
-    for (const key in definition.queries) {
-      // Create a reactive query state.
-      const queryState = reactive<QueryState<any>>({
-        value: undefined,
-        isLoading: false,
-        isFetching: false,
-        error: null
-      });
-      (store as any)[key] = queryState;
-
-      const execute = async () => {
-        queryState.isFetching = true;
-        const query = definition.queries![key](store);
-        if (!query) {
-          queryState.error = new Error("Query not found");
-          queryState.isFetching = false;
-          return;
+  // ─── Attach Lazy Getters (using computed) ───────────────
+  if (definition.getters) {
+    for (const key in definition.getters) {
+      const getterFn = definition.getters[key];
+      const comp = computed(() => getterFn(store));
+      Object.defineProperty(store, key, {
+        enumerable: true,
+        configurable: true,
+        get() {
+          return comp.value;
         }
-        try {
-          const value = await query.fn();
-          queryState.value = value;
-          queryState.error = null;
-        } catch (error) {
-          queryState.error =
-            error instanceof Error ? error : new Error(String(error));
-        } finally {
-          queryState.isFetching = false;
-        }
-      };
-
-      const eff = effect(execute);
-      effects.set(key, eff);
-
-      // Also update `isLoading` based on whether the query is still fetching and has no value.
-      effect(() => {
-        queryState.isLoading =
-          queryState.isFetching && queryState.value === undefined;
       });
+      // Optionally, if you wish to have a handle on the computed effect, you can store it in effects.
+      // effects.set(String(key), (comp as any)._effect);
     }
   }
 
-  // ─── Attach Getters ────────────────────────────────────────────
+  // ─── Attach Lazy Queries ─────────────────────────────────
+  if (definition.queries) {
+    for (const key in definition.queries) {
+      const keyStr = key;
+      // Create lazy container data for this query.
+      const lazyData: LazyData = {
+        initialized: false,
+        queryEff: null,
+        queryState: reactive<QueryState<any>>({
+          value: undefined,
+          isLoading: false,
+          isFetching: false,
+          error: null
+        })
+      };
+      lazyQueryData.set(keyStr, lazyData);
 
-  if (definition.getters) {
-    for (const key in definition.getters) {
-      const getterFn = definition.getters[key] as (
-        state: StoreStateType<T, G, Q>
-      ) => any;
-      const eff = effect(() => {
-        store[key as keyof Store<T, G, Q, A>] = getterFn(store);
+      Object.defineProperty(store, key, {
+        enumerable: true,
+        configurable: true,
+        get() {
+          if (!lazyData.initialized) {
+            // Initialize the query effect on first access.
+            lazyData.queryEff = effect(() => {
+              lazyData.queryState.isFetching = true;
+              const query = definition.queries![key](store);
+              if (!query) {
+                lazyData.queryState.error = new Error("Query not found");
+                lazyData.queryState.isFetching = false;
+                return;
+              }
+              query
+                .fn()
+                .then((value: any) => {
+                  lazyData.queryState.value = value;
+                  lazyData.queryState.error = null;
+                })
+                .catch((error: any) => {
+                  lazyData.queryState.error =
+                    error instanceof Error ? error : new Error(String(error));
+                })
+                .finally(() => {
+                  lazyData.queryState.isFetching = false;
+                });
+            });
+            effects.set(keyStr, lazyData.queryEff!);
+            // Also track isLoading based on isFetching and whether a value exists.
+            effect(() => {
+              lazyData.queryState.isLoading =
+                lazyData.queryState.isFetching &&
+                lazyData.queryState.value === undefined;
+            });
+            lazyData.initialized = true;
+          }
+          return lazyData.queryState;
+        }
       });
-      effects.set(key, eff);
     }
   }
 
